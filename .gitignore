@@ -1,0 +1,13 @@
+*.so
+*.pcm
+*.d
+*.o
+*.C~
+*.cxx~
+*.h~
+*.save
+*.root
+*.pdf
+*.png
+*.jpg
+*.jpeg
