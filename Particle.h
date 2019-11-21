@@ -9,8 +9,8 @@ class Particle : public TObject{
  public:
   Particle(double x=0.,double y=0.,double z=0.,double theta=0.,double phi=0.);
   ~Particle();
-  void SetPoint();
-  void SetDirection();
+  void SetPoint(double x, double y, double z);
+  void SetDirection(double theta, double phi);
   double GetX() const;
   double GetY() const;
   double GetZ() const;
