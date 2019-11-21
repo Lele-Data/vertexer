@@ -1,3 +1,4 @@
+*.json
 *.so
 *.pcm
 *.d
