@@ -3,21 +3,19 @@
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
+#include <Riostream.h>
 #include "BeamPipe.h"
 
-BeamPipe::BeamPipe(double radius, double thickness):Cylinder(){
-  fRadius = radius;
-  fThickness = thickness;
+ClassImp(BeamPipe);
+
+BeamPipe::BeamPipe(double radius, double thickness):Cylinder(radius,thickness){
+  // constructor
 }
 
 BeamPipe::~BeamPipe(){
-  //destructor
+  // destructor
 }
 
-TString BeamPipe::PrintCylinderType() const{
-  return "Beam Pipe";
+void BeamPipe::PrintCylinderType() const{
+  std::cout<<"Beam Pipe"<<std::endl;
 }
-
-
-
-

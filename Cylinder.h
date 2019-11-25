@@ -7,17 +7,18 @@
 #define CYLINDER_H
 
 #include <TObject.h>
-#include <TString.h>
 
 class Cylinder : public TObject{
  public:
-  virtual TString PrintCylinderType() const = 0;
+  Cylinder(double radius=0.,double thickness=0.);
+  virtual void PrintCylinderType() const = 0;
   double GetThickness() const;
   double GetRadius() const;
- protected:
-  double fThickness;
+ private:
   double fRadius;
+  double fThickness;
 
  ClassDef(Cylinder,1);
 };
-#endif
+
+#endif // CYLINDER_H

@@ -3,26 +3,24 @@
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
+#include <Riostream.h>
 #include "Layer.h"
 
-Layer::Layer(double radius, double thickness, double length):Cylinder(){
-  fRadius = radius;
-  fThickness = thickness;
-  fLength = length;
+ClassImp(Layer);
+
+Layer::Layer(double radius, double thickness, double length):Cylinder(radius,thickness),
+fLength(length){
+  // constructor
 }
 
 Layer::~Layer(){
-  //destructor
+  // destructor
 }
 
-TString Layer::PrintCylinderType() const{
-  return "Layer";
+void Layer::PrintCylinderType() const{
+  std::cout<<"Layer"<<std::endl;
 }
 
 double Layer::GetLength() const{
   return fLength;
 }
-
-
-
-

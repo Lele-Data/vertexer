@@ -6,6 +6,7 @@
 #include <TObject.h>
 #include "Point2D.h"
 
+ClassImp(Point2D);
 
 Point2D::Point2D(double z,double phi):TObject(),
 fZ(z),
@@ -20,8 +21,7 @@ Point2D::~Point2D(){
 double Point2D::GetZ() const{
   return fZ;
 };
+
 double Point2D::GetPhi() const{
   return fPhi;
 };
-
-

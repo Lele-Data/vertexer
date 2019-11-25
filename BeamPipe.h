@@ -10,10 +10,11 @@
 
 class BeamPipe : public Cylinder{
  public:
-  BeamPipe(double radius=0., double thickness = 0.);  
+  BeamPipe(double radius=0.,double thickness = 0.);  
   ~BeamPipe();  
-  virtual TString PrintCylinderType() const;
+  virtual void PrintCylinderType() const;
  
  ClassDef(BeamPipe,1);
 };
-#endif
+
+#endif // BEAMPIPE_H

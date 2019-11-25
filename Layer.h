@@ -10,14 +10,14 @@
 
 class Layer : public Cylinder{
  public:
-  Layer(double radius=0., double thickness = 0.,double length=0.);  
+  Layer(double radius=0.,double thickness = 0.,double length=0.);  
   ~Layer();  
-  virtual TString PrintCylinderType() const;
+  virtual void PrintCylinderType() const;
   double GetLength() const;
-
  private:
   double fLength;
   
  ClassDef(Layer,1);
 };
-#endif
+
+#endif // LAYER_H

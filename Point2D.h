@@ -20,4 +20,5 @@ class Point2D : public TObject{
 
  ClassDef(Point2D,1);
 };
-#endif
+
+#endif // POINT2D_H
