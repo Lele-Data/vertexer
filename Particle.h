@@ -22,4 +22,6 @@ class Particle : public TObject{
   double fZ;
   double fTheta;
   double fPhi;
+
+ ClassDef(Particle,1);
 };
