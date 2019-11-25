@@ -1,5 +1,5 @@
 // Point2D.cxx
-// Implementation of Point2D.h
+// Implementation of Point2D.cxx
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
