@@ -24,14 +24,4 @@ double Point2D::GetPhi() const{
   return fPhi;
 };
 
-void Point2D::SetPoint2D(double z, double phi){
-  fZ = z;
-  fPhi = phi;
-};
-void Point2D::SetZ(double z){
-  fZ = z;
-};
-void Point2D::SetPhi(double phi){
-  fPhi = phi;
-};
 
