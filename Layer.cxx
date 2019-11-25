@@ -15,7 +15,7 @@ Layer::~Layer(){
   //destructor
 }
 
-TString Layer::GetCylinderType() const{
+TString Layer::PrintCylinderType() const{
   return "Layer";
 }
 

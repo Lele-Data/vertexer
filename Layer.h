@@ -12,7 +12,7 @@ class Layer : public Cylinder{
  public:
   Layer(double radius=0., double thickness = 0.,double length=0.);  
   ~Layer();  
-  virtual TString GetCylinderType() const;
+  virtual TString PrintCylinderType() const;
   double GetLength() const;
 
  private:

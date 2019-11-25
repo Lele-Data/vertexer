@@ -14,7 +14,7 @@ BeamPipe::~BeamPipe(){
   //destructor
 }
 
-TString BeamPipe::GetCylinderType() const{
+TString BeamPipe::PrintCylinderType() const{
   return "Beam Pipe";
 }
 

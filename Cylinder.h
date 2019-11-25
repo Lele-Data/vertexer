@@ -11,7 +11,7 @@
 
 class Cylinder : public TObject{
  public:
-  virtual TString GetCylinderType() const = 0;
+  virtual TString PrintCylinderType() const = 0;
   double GetThickness() const;
   double GetRadius() const;
  protected:
