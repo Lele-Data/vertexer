@@ -3,6 +3,9 @@
 //
 // Authors: Mario Ciacco & Emanuele Data
 
+#ifndef PARTICLE_H
+#define PARTICLE_H
+
 #include <TObject.h>
 
 class Particle : public TObject{
@@ -22,4 +25,7 @@ class Particle : public TObject{
   double fZ;
   double fTheta;
   double fPhi;
+
+ ClassDef(Particle,1);
 };
+#endif  
