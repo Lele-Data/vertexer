@@ -3,6 +3,9 @@
 //
 // Authors: Mario Ciacco & Emanuele Data
 
+#ifndef POINT2D_H
+#define POINT2D_H
+
 #include <TObject.h>
 
 class Point2D : public TObject{
@@ -20,3 +23,4 @@ class Point2D : public TObject{
 
  ClassDef(Point2D,1);
 };
+#endif
