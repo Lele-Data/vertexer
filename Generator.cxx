@@ -18,7 +18,7 @@ ClassImp(Generator);
 TH1F *Generator::hEta=NULL; // static data member
 TH1F *Generator::hMult=NULL;
 
-Generator::Generator(unsigned int seed):TObject()
+Generator::Generator():TObject()
 {
   TFile kin("kinem.root");
   hMult=(TH1F*)kin.Get("hmul");
