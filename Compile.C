@@ -18,6 +18,8 @@ void Compile(const char option='n') {
   gSystem->CompileMacro("Cylinder.cxx",opt.data());
   gSystem->CompileMacro("Layer.cxx",opt.data());
   gSystem->CompileMacro("BeamPipe.cxx",opt.data());
+  // Class for the MC generator
+  gSystem->CompileMacro("Generator.cxx",opt.data());
 }
 
 
