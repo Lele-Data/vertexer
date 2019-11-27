@@ -8,7 +8,7 @@
 
 ClassImp(Layer);
 
-Layer::Layer(double radius, double thickness, double length):Cylinder(radius,thickness),
+Layer::Layer(double radius,double thickness,double length):Cylinder(radius,thickness),
 fLength(length){
   // constructor
 }

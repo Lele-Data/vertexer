@@ -10,7 +10,7 @@
 
 class Layer : public Cylinder{
  public:
-  Layer(double radius=0.,double thickness = 0.,double length=0.);  
+  Layer(double radius=0.,double thickness=0.,double length=0.);  
   ~Layer();  
   virtual void PrintCylinderType() const;
   double GetLength() const;
