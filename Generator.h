@@ -17,7 +17,7 @@ const double kSigZ=5.00; // cm
 
 class Generator : public TObject{
  public:
-  Generator(unsigned int seed=123);
+  Generator();
   ~Generator();
   double GenerateMultiplicity(int nMultMethod) const;
   void GenerateVertex(double& x,double& y,double& z) const;
