@@ -14,19 +14,18 @@
 ClassImp(Generator);
 
 TH1F *Generator::hEta=NULL; // static data member
-TH1F *Generator::hMult=NULL;
+TH1F *Generator::hMult=NULL; // static data member
 
-TH1F* GetResizedHistogram(TH1F*,double,double);
+TH1F* GetResizedHistogram(TH1F*,double,double); // helper function
 
-Generator::Generator():TObject()
-{
+Generator::Generator():TObject(){
   TFile kin("kinem.root");
   hMult=(TH1F*)kin.Get("hmul");
   TH1F* hEtaNotRes=(TH1F*)kin.Get("heta");
   hMult->SetDirectory(0); // ROOT is the owner of this histogram
-  hEtaNotRes->SetDirectory(0); // ROOT is the owner of this histogram
-  kin.Close();
   hEta=GetResizedHistogram(hEtaNotRes,-2.,2.);
+  hEta->SetDirectory(0); // ROOT is the owner of this histogram
+  kin.Close();
   RandomEta[0]=UniformEta;
   RandomEta[1]=HistEta;
   RandomMultiplicity[0]=UniformMultiplicity;

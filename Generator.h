@@ -22,7 +22,6 @@ class Generator : public TObject{
   double GenerateMultiplicity(int nMultMethod) const;
   void GenerateVertex(double& x,double& y,double& z) const;
   void GenerateParticle(Particle& particle,int nEtaMethod) const; // generate the particle direction
-  
  private:
   double (*RandomEta[2])();
   double (*RandomMultiplicity[3])();
@@ -31,7 +30,6 @@ class Generator : public TObject{
   static double UniformMultiplicity();
   static double HistMultiplicity();
   static double ConstantMultiplicity();
-  void ResizeHistogram(); // helper function
   static TH1F *hEta;
   static TH1F *hMult;
 
