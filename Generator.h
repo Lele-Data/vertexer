@@ -22,6 +22,7 @@ class Generator : public TObject{
   double GenerateMultiplicity(int nMultMethod) const;
   void GenerateVertex(double& x,double& y,double& z) const;
   void GenerateParticle(Particle& particle,int nEtaMethod) const; // generate the particle direction
+  
  private:
   double (*RandomEta[2])();
   double (*RandomMultiplicity[3])();
