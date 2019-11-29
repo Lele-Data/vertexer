@@ -53,6 +53,5 @@ double  ComputeT(double theta,double phi,double radius,double x_vert,double y_ve
   double c=x_vert*x_vert+y_vert*y_vert-radius*radius;
   double bb_4ac=b*b-4*a*c;
   double sqrt_bb_4ac=sqrt(bb_4ac);
-  if(true) return (-b+sqrt_bb_4ac)/(2*a); // choose the forward propagating particle
-  return (-b-sqrt_bb_4ac)/(2*a);
+  return (-b+sqrt_bb_4ac)/(2*a); // choose the forward propagating particle
 }
