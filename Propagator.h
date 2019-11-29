@@ -12,7 +12,7 @@
 #include "Layer.h"
 #include "Point2D.h"
 
-const double kRMSscat=0.001;
+const double kRMSscat=0.001; // rad
 
 class Propagator : public TObject{
  public:
@@ -27,7 +27,6 @@ class Propagator : public TObject{
   static double Onscattering();  // 1
 
  ClassDef(Propagator,1);
-  
 };
 
 #endif // PROPAGATOR_H

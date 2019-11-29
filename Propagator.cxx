@@ -5,10 +5,11 @@
 
 #include "Propagator.h"
 #include <TRandom3.h>
-
-double  ComputeT(double,double,double,double,double,bool);
+#include <Riostream.h>
 
 ClassImp(Propagator);
+
+double ComputeT(double,double,double,double,double); // helper function
 
 Propagator::Propagator():TObject(){
   RandomScat[0]=OffScattering;
@@ -28,10 +29,11 @@ void Propagator::Intersection(Particle& particle,Cylinder *cylinder){
   double x=sin(theta)*cos(phi)*t_val+particle.GetX();
   double y=sin(theta)*sin(phi)*t_val+particle.GetY();
   double z=cos(theta)*t_val+particle.GetZ();
+  particle.SetPoint(x,y,z);
 }
 
 Point2D Propagator::Intersection(Particle& particle,Layer *layer){
-
+  return 0;
 }
 
 double Propagator::OffScattering(){
@@ -42,7 +44,7 @@ double Propagator::Onscattering(){
   return gRandom->Gaus(0.,kRMSscat);  
 }  
 
-double  ComputeT(double theta,double phi,double radius,double x_vert,double y_vert,bool plus=true){
+double  ComputeT(double theta,double phi,double radius,double x_vert,double y_vert){
   double sin_theta=sin(theta);
   double cos_phi=cos(phi);
   double sin_phi=sin(phi);
@@ -51,6 +53,5 @@ double  ComputeT(double theta,double phi,double radius,double x_vert,double y_ve
   double c=x_vert*x_vert+y_vert*y_vert-radius*radius;
   double bb_4ac=b*b-4*a*c;
   double sqrt_bb_4ac=sqrt(bb_4ac);
-  if(plus) return (-b+sqrt_bb_4ac)/(2*a);
-  return (-b-sqrt_bb_4ac)/(2*a);
+  return (-b+sqrt_bb_4ac)/(2*a); // choose the forward propagating particle
 }

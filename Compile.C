@@ -18,8 +18,10 @@ void Compile(const char option='n') {
   gSystem->CompileMacro("Cylinder.cxx",opt.data());
   gSystem->CompileMacro("Layer.cxx",opt.data());
   gSystem->CompileMacro("BeamPipe.cxx",opt.data());
-  // Class for the MC generator
+  // Class for the MC generator and propagator
+  std::cout<<"Compile classes for the MC generator and propagator..."<<std::endl;
   gSystem->CompileMacro("Generator.cxx",opt.data());
+  gSystem->CompileMacro("Propagator.cxx",opt.data());
 }
 
 
