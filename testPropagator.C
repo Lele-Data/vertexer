@@ -1,3 +1,5 @@
+// test generator and propagator
+
 #include <TCanvas.h>
 #include <TH3D.h>
 #include <TLine.h>
@@ -28,31 +30,35 @@ void testPropagator(){
   BeamPipe *bp=new BeamPipe(3,0.08); // cm
   Layer *l1=new Layer(4,0.02,27); //cm
   Propagator prop;
-  Particle p1(0,0,0,0,0);
   g.GenerateVertex(xv,yv,zv);
-  p1.SetPoint(xv,yv,zv);
-  hist->Fill(p1.GetX(),p1.GetY(),p1.GetZ());
-  PrintParticle(p1);
-  g.GenerateParticle(p1,1);
-  PrintParticle(p1);
-  // intersezione beam pipe
-  std::cout<<"-->intersezione beam pipe"<<std::endl;
-  prop.Intersection(p1,bp);
-  PrintParticle(p1);
-  hist->Fill(p1.GetX(),p1.GetY(),p1.GetZ());
-  // controllo che l'intersezione appartenga alla beampipe
-  double R=TMath::Sqrt(p1.GetX()*p1.GetX()+p1.GetY()*p1.GetY());
-  std::cout<<"controllo che l'intersezione appartenga alla beampipe "<<R<<std::endl;
-  // intersezione layer 1
-  std::cout<<"-->intersezione layer 1"<<std::endl;
-  Point2D hit1;
-  hit1=prop.Intersection(p1,l1);
-  std::cout<<"Hit: Z="<<hit1.GetZ()<<" phi="<<hit1.GetPhi()<<std::endl;
-  R=TMath::Sqrt(p1.GetX()*p1.GetX()+p1.GetY()*p1.GetY());
-  std::cout<<"controllo che l'intersezione appartenga al layer 1 "<<R<<std::endl;
-
-  PrintParticle(p1);
-  hist->Fill(p1.GetX(),p1.GetY(),p1.GetZ());
+  hist->Fill(xv,yv,zv);
+  for(int i=0;i<50;++i){
+    Particle p1(0,0,0,0,0);
+    p1.SetPoint(xv,yv,zv);
+    PrintParticle(p1);
+    g.GenerateParticle(p1,1);
+    PrintParticle(p1);
+    // intersezione beam pipe
+    std::cout<<"-->intersezione beam pipe"<<std::endl;
+    prop.Intersection(p1,bp);
+    PrintParticle(p1);
+    hist->Fill(p1.GetX(),p1.GetY(),p1.GetZ());
+    // controllo che l'intersezione appartenga alla beampipe
+    double R=TMath::Sqrt(p1.GetX()*p1.GetX()+p1.GetY()*p1.GetY());
+    std::cout<<"controllo che l'intersezione appartenga alla beampipe "<<R<<std::endl;
+    // intersezione layer 1
+    std::cout<<"-->intersezione layer 1"<<std::endl;
+    Point2D hit1;
+    prop.Intersection(p1,l1);
+    if(p1.GetZ()<l1->GetLength()/2.&&p1.GetZ()>-l1->GetLength()/2.){
+      hit1=prop.ComputeHit(p1,l1);
+      std::cout<<"Hit: Z="<<hit1.GetZ()<<" phi="<<hit1.GetPhi()<<std::endl;
+      R=TMath::Sqrt(p1.GetX()*p1.GetX()+p1.GetY()*p1.GetY());
+      std::cout<<"controllo che l'intersezione appartenga al layer 1 "<<R<<std::endl;
+      PrintParticle(p1);
+      hist->Fill(p1.GetX(),p1.GetY(),p1.GetZ());
+    }
+  }
   hist->Draw("P");
 }
 

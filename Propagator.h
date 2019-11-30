@@ -20,7 +20,7 @@ class Propagator : public TObject{
   ~Propagator();
   void MultipleScattering(Particle& particle,int nScatMethod);
   void Intersection(Particle& particle,Cylinder *cylinder);
-  Point2D Intersection(Particle& particle,Layer *layer);
+  Point2D ComputeHit(Particle particle,Layer *layer);
  private:
   double (*RandomScat[2])();
   static double OffScattering(); // 0
