@@ -10,7 +10,7 @@
 ClassImp(Propagator);
 
 double ComputeT(double,double,double,double,double); // helper function
-void ComputePoint(Particle&,double&,double&,double&,double);
+void ComputePoint(Particle,double&,double&,double&,double);
 
 Propagator::Propagator():TObject(){
   RandomScat[0]=OffScattering;
@@ -30,17 +30,12 @@ void Propagator::Intersection(Particle& particle,Cylinder *cylinder){
   particle.SetPoint(x,y,z);
 }
 
-Point2D Propagator::Intersection(Particle& particle,Layer *layer){
+Point2D Propagator::ComputeHit(Particle particle,Layer *layer){
   double x,y,z;
   double layer_length=layer->GetLength();
   double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetRadius(),particle.GetX(),particle.GetY());
   ComputePoint(particle,x,y,z,t_val);
-  particle.SetPoint(x,y,z);
-  if(particle.GetZ()<(-layer_length/2.)&&particle.GetZ()>layer_length/2.) return 0;
-  Point2D hit(particle.GetZ(),particle.GetPhi());
-  t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetThickness(),particle.GetX(),particle.GetY());
-  ComputePoint(particle,x,y,z,t_val);
-  particle.SetPoint(x,y,z);
+  Point2D hit(z,particle.GetPhi());
   return hit;
 }
 
@@ -64,7 +59,7 @@ double  ComputeT(double theta,double phi,double radius,double x_vert,double y_ve
   return (-b+sqrt_bb_4ac)/(2*a); // choose the forward propagating particle
 }
 
-void ComputePoint(Particle& particle,double& x,double& y,double& z,double t_val){
+void ComputePoint(Particle particle,double& x,double& y,double& z,double t_val){
   double theta=particle.GetTheta();
   double phi=particle.GetPhi();
   x=sin(theta)*cos(phi)*t_val+particle.GetX();
