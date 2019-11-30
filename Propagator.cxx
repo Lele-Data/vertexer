@@ -10,6 +10,7 @@
 ClassImp(Propagator);
 
 double ComputeT(double,double,double,double,double); // helper function
+void ComputePoint(Particle&,double&,double&,double&,double);
 
 Propagator::Propagator():TObject(){
   RandomScat[0]=OffScattering;
@@ -23,17 +24,24 @@ void Propagator::MultipleScattering(Particle& particle,int nScatMethod){
 }
 
 void Propagator::Intersection(Particle& particle,Cylinder *cylinder){
+  double x,y,z;
   double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),cylinder->GetRadius()+cylinder->GetThickness(),particle.GetX(),particle.GetY());
-  double theta=particle.GetTheta();
-  double phi=particle.GetPhi();
-  double x=sin(theta)*cos(phi)*t_val+particle.GetX();
-  double y=sin(theta)*sin(phi)*t_val+particle.GetY();
-  double z=cos(theta)*t_val+particle.GetZ();
+  ComputePoint(particle,x,y,z,t_val);
   particle.SetPoint(x,y,z);
 }
 
 Point2D Propagator::Intersection(Particle& particle,Layer *layer){
-  return 0;
+  double x,y,z;
+  double layer_length=layer->GetLength();
+  double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetRadius(),particle.GetX(),particle.GetY());
+  ComputePoint(particle,x,y,z,t_val);
+  particle.SetPoint(x,y,z);
+  if(particle.GetZ()<(-layer_length/2.)&&particle.GetZ()>layer_length/2.) return 0;
+  Point2D hit(particle.GetZ(),particle.GetPhi());
+  t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetThickness(),particle.GetX(),particle.GetY());
+  ComputePoint(particle,x,y,z,t_val);
+  particle.SetPoint(x,y,z);
+  return hit;
 }
 
 double Propagator::OffScattering(){
@@ -54,4 +62,12 @@ double  ComputeT(double theta,double phi,double radius,double x_vert,double y_ve
   double bb_4ac=b*b-4*a*c;
   double sqrt_bb_4ac=sqrt(bb_4ac);
   return (-b+sqrt_bb_4ac)/(2*a); // choose the forward propagating particle
+}
+
+void ComputePoint(Particle& particle,double& x,double& y,double& z,double t_val){
+  double theta=particle.GetTheta();
+  double phi=particle.GetPhi();
+  x=sin(theta)*cos(phi)*t_val+particle.GetX();
+  y=sin(theta)*sin(phi)*t_val+particle.GetY();
+  z=cos(theta)*t_val+particle.GetZ();
 }
