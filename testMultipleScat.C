@@ -1,3 +1,5 @@
+// This macro tests the multiple scattering method on a generated particle
+
 #include <Riostream.h>
 #include "Particle.h"
 #include "Generator.h"
