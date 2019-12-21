@@ -20,8 +20,8 @@ Point2D::~Point2D(){
 
 double Point2D::GetZ() const{
   return fZ;
-};
+}
 
 double Point2D::GetPhi() const{
   return fPhi;
-};
+}

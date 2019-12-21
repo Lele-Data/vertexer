@@ -13,6 +13,8 @@
 
 ClassImp(Propagator);
 
+Propagator *Propagator::fInstance=NULL; // static data member
+
 double ComputeT(double,double,double,double,double); // helper function
 void ComputePoint(Particle,double&,double&,double&,double);
 void Rotate(double,double,double,double,double*);
@@ -23,6 +25,17 @@ Propagator::Propagator():TObject(){
 }
 
 Propagator::~Propagator(){}
+
+Propagator *Propagator::GetInstance(){
+  if(!Propagator::fInstance) fInstance=new Propagator();
+  return fInstance;
+}
+
+Propagator *Propagator::Destroy(){
+  if(Propagator::fInstance) delete fInstance;
+  fInstance=NULL;
+  return fInstance;
+}
 
 void Propagator::MultipleScattering(Particle& particle,int nScatMethod){
   double u[3]; // direction 

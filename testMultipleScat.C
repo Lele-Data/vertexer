@@ -6,9 +6,11 @@
 #include "Propagator.h"
 
 void testMultipleScat(){
-    Generator g;
-    Propagator prop;
-    Particle p;
-    g.GenerateParticle(p,1);
-    prop.MultipleScattering(p,1);
+  Generator *g=Generator::GetInstance();
+  Propagator *prop=Propagator::GetInstance();
+  Particle p;
+  g->GenerateParticle(p,1);
+  prop->MultipleScattering(p,1);
+  prop=Propagator::Destroy();
+  g=Generator::Destroy();
 }

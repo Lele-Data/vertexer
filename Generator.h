@@ -17,12 +17,16 @@ const double kSigZ=5.00; // cm
 
 class Generator : public TObject{
  public:
-  Generator();
-  ~Generator();
+  static Generator *GetInstance(); // singleton class method
+  static Generator *Destroy();     // singleton class method
   double GenerateMultiplicity(int nMultMethod) const;
   void GenerateVertex(double& x,double& y,double& z) const;
   void GenerateParticle(Particle& particle,int nEtaMethod) const; // generate the particle direction
  private:
+  Generator();                     // (private) default constructor
+  Generator(const Generator& gen); // (private) copy constructor
+  ~Generator();                    // (private) destructor
+  static Generator *fInstance;     // The class instance
   double (*RandomEta[2])();
   double (*RandomMultiplicity[3])();
   static double UniformEta();

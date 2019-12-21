@@ -13,8 +13,9 @@
 
 ClassImp(Generator);
 
-TH1F *Generator::hEta=NULL; // static data member
-TH1F *Generator::hMult=NULL; // static data member
+Generator *Generator::fInstance=NULL; // static data member
+TH1F *Generator::hEta=NULL;           // static data member
+TH1F *Generator::hMult=NULL;          // static data member
 
 TH1F* GetResizedHistogram(TH1F*,double,double); // helper function
 
@@ -34,6 +35,17 @@ Generator::Generator():TObject(){
 }
 
 Generator::~Generator(){
+}
+
+Generator *Generator::GetInstance(){
+  if(!Generator::fInstance) fInstance=new Generator();
+  return fInstance;
+}
+
+Generator *Generator::Destroy(){
+  if(Generator::fInstance) delete fInstance;
+  fInstance=NULL;
+  return fInstance;
 }
 
 double Generator::GenerateMultiplicity(int nMultMethod) const{

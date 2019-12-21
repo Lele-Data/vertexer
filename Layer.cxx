@@ -1,5 +1,5 @@
 // Layer.cxx
-// Implementation of Layer.cxx
+// Implementation of Layer.h
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
