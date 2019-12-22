@@ -1,3 +1,5 @@
+# Igonre these extensions
+
 *.json
 *.so
 *.pcm
@@ -12,3 +14,7 @@
 *.png
 *.jpg
 *.jpeg
+
+# Allow the root file "kinem.root"
+
+!files/kinem.root

@@ -6,22 +6,26 @@
 #include <Riostream.h>
 #include <string>
 
+const char *BUILD_DIR="build"; // build directory name
+
 void Compile(const char option='n') {
+  gSystem->mkdir(BUILD_DIR); // make build directory
   std::string opt="kg";
   if(option=='f') opt="kfg";
   // Classes for MC particles and intersections
   std::cout<<"Compile classes for MC particles and intersections..."<<std::endl;
-  gSystem->CompileMacro("Particle.cxx",opt.data());
-  gSystem->CompileMacro("Point2D.cxx",opt.data());
+  gSystem->CompileMacro("src/Particle.cxx",opt.data(),"",BUILD_DIR);
+  gSystem->CompileMacro("src/Point2D.cxx",opt.data(),"",BUILD_DIR);
   // Classes for the detector definition
   std::cout<<"Compile classes for the detector definition..."<<std::endl;
-  gSystem->CompileMacro("Cylinder.cxx",opt.data());
-  gSystem->CompileMacro("Layer.cxx",opt.data());
-  gSystem->CompileMacro("BeamPipe.cxx",opt.data());
+  gSystem->CompileMacro("src/Cylinder.cxx",opt.data(),"",BUILD_DIR);
+  gSystem->CompileMacro("src/Layer.cxx",opt.data(),"",BUILD_DIR);
+  gSystem->CompileMacro("src/BeamPipe.cxx",opt.data(),"",BUILD_DIR);
   // Class for the MC generator and propagator
   std::cout<<"Compile classes for the MC generator and propagator..."<<std::endl;
-  gSystem->CompileMacro("Generator.cxx",opt.data());
-  gSystem->CompileMacro("Propagator.cxx",opt.data());
+  gSystem->CompileMacro("src/Generator.cxx",opt.data(),"",BUILD_DIR);
+  gSystem->CompileMacro("src/Propagator.cxx",opt.data(),"",BUILD_DIR);
+  // Class for the MC simulation manager
+  std::cout<<"Compile class for the MC simulation manager..."<<std::endl;
+  gSystem->CompileMacro("src/SimulManager.cxx",opt.data(),"",BUILD_DIR);
 }
-
-

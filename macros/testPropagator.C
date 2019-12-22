@@ -5,13 +5,13 @@
 #include <TLine.h>
 #include <Riostream.h>
 #include <TMath.h>
-#include "Generator.h"
-#include "Particle.h"
-#include "Cylinder.h"
-#include "Layer.h"
-#include "BeamPipe.h"
-#include "Point2D.h"
-#include "Propagator.h"
+#include "../src/Generator.h"
+#include "../src/Particle.h"
+#include "../src/Cylinder.h"
+#include "../src/Layer.h"
+#include "../src/BeamPipe.h"
+#include "../src/Point2D.h"
+#include "../src/Propagator.h"
 
 void PrintParticle(Particle);
 

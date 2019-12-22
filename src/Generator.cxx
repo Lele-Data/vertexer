@@ -17,7 +17,7 @@ TH1F *Generator::hMult=NULL;          // static data member
 TH1F* GetResizedHistogram(TH1F*,double,double); // helper function
 
 Generator::Generator():TObject(){
-  TFile kin("kinem.root");
+  TFile kin("files/kinem.root");
   hMult=(TH1F*)kin.Get("hmul");
   TH1F* hEtaNotRes=(TH1F*)kin.Get("heta");
   hMult->SetDirectory(0); // ROOT is the owner of this histogram

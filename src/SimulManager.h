@@ -14,16 +14,17 @@
 #include "BeamPipe.h"
 #include "Layer.h"
 
-class SimulManager{
+class SimulManager : public TObject{
  public:
   SimulManager();
+  SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
   ~SimulManager();
   void RunSimulation(TTree *tree,TClonesArray& layerArr1,TClonesArray& layerArr2,BeamPipe *bpipe,Layer *layers[2]);
  private:
+  int fEvent;          // number of events
   int fMultMethod;     // number of the method chosen for multiplicity generation
   int fEtaMethod;      // number of the method chosen for eta generation
   int fMultScatMethod; // number of the method chosen for multiple scattering
-  int fEvent;          // number of events
   double fTmpZ;        // temporary z used to compute hit
   double fTmpPhi;      // temporary phi used to compute hit
   Generator *gen;      // MC generator (vertex and particle generation)
