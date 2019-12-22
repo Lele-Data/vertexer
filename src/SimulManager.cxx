@@ -3,29 +3,37 @@
 //
 // Authors: Mario Ciacco & Emanuele Data
 
+#include <TRandom3.h>
 #include "SimulManager.h"
 
-// default constructor
-SimulManager::SimulManager():TObject(),
-fEvent(0),
-fMultMethod(0),
-fEtaMethod(0),
-fMultScatMethod(0){
-  gen=NULL;
-  prop=NULL;
-}
+ClassImp(SimulManager)
 
-// standard constructor
-SimulManager::SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed=12345):TObject(),
+SimulManager *SimulManager::fInstance=NULL; // static data member
+
+SimulManager::SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed):TObject(),
 fEvent(nEvent),
 fMultMethod(nMult),
 fEtaMethod(nEta),
 fMultScatMethod(nScat){
+  gRandom->SetSeed(seed);
   gen=Generator::GetInstance();
   prop=Propagator::GetInstance();
 }
 
 SimulManager::~SimulManager(){
+  gen=Generator::Destroy();
+  prop=Propagator::Destroy();
+}
+
+SimulManager *SimulManager::GetInstance(int nEvent,int nMult,int nEta,int nScat,uint seed){
+  if(!SimulManager::fInstance) fInstance=new SimulManager(nEvent,nMult,nEta,nScat,seed);
+  return fInstance;
+}
+
+SimulManager *SimulManager::Destroy(){
+  if(SimulManager::fInstance) delete fInstance;
+  fInstance=NULL;
+  return fInstance;
 }
 
 void SimulManager::RunSimulation(TTree *tree,TClonesArray& layerArr1,TClonesArray& layerArr2,BeamPipe *bpipe,Layer *layers[2]){
