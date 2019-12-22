@@ -14,11 +14,18 @@
 #include "BeamPipe.h"
 #include "Layer.h"
 
+typedef struct{
+  double X;
+  double Y;
+  double Z;
+  double Mult;
+}VTX;
+
 class SimulManager : public TObject{
  public:
   static SimulManager *GetInstance(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
   static SimulManager *Destroy();
-  void RunSimulation(TTree *tree,TClonesArray& layerArr1,TClonesArray& layerArr2,BeamPipe *bpipe,Layer *layers[2]);
+  void RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const;
  private:
   SimulManager();                    // (private) default constructor
   SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
@@ -29,8 +36,6 @@ class SimulManager : public TObject{
   int fMultMethod;     // number of the method chosen for multiplicity generation
   int fEtaMethod;      // number of the method chosen for eta generation
   int fMultScatMethod; // number of the method chosen for multiple scattering
-  double fTmpZ;        // temporary z used to compute hit
-  double fTmpPhi;      // temporary phi used to compute hit
   Generator *gen;      // MC generator (vertex and particle generation)
   Propagator *prop;    // MC propagator (particle transport)
 
