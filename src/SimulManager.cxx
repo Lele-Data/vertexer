@@ -62,7 +62,7 @@ void SimulManager::RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLay
         new(hitsFirstLayer[iFirstLayer++])Point2D(TmpZ,TmpPhi); // add hit to TClonesArray
         prop->MultipleScattering(particle,fMultScatMethod);     // compute new direction
         // INTERACTION WITH LAYER 2
-        prop->Intersection(particle,layers[0]);          // intersect with layer 2
+        prop->Intersection(particle,layers[1]);          // intersect with layer 2
         if(particle.GetZ()>(-layers[1]->GetLength()/2.)&&particle.GetZ()<(layers[1]->GetLength()/2.)){ // intersection check on second layer
           prop->ComputeHit(particle,layers[1],TmpZ,TmpPhi);        //compute hit on layer
           new(hitsSecondLayer[iSecondLayer++])Point2D(TmpZ,TmpPhi);// add hit to TClonesArray
