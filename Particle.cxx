@@ -3,7 +3,6 @@
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
-#include <TObject.h>
 #include "Particle.h"
 
 ClassImp(Particle);

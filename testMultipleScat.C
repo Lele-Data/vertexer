@@ -9,8 +9,8 @@ void testMultipleScat(){
   Generator *g=Generator::GetInstance();
   Propagator *prop=Propagator::GetInstance();
   Particle p;
-  g->GenerateParticle(p,1);
-  prop->MultipleScattering(p,1);
+  g->GenerateParticle(p,EtaMethod::kHistEta);
+  prop->MultipleScattering(p,MultScatMethod::kOnScat);
   prop=Propagator::Destroy();
   g=Generator::Destroy();
 }

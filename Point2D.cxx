@@ -3,7 +3,6 @@
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
-#include <TObject.h>
 #include "Point2D.h"
 
 ClassImp(Point2D);

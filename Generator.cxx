@@ -3,12 +3,9 @@
 // 
 // Authors: Mario Ciacco & Emanuele Data
 
-#include <TObject.h>
 #include <TFile.h>
-#include <TH1F.h>
 #include <TRandom3.h>
 #include <TMath.h>
-#include "Particle.h"
 #include "Generator.h"
 
 ClassImp(Generator);

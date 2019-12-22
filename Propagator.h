@@ -14,6 +14,11 @@
 
 const double kRMSscat=0.001; // rad
 
+enum MultScatMethod{
+  kOffScat=0, // turn off multiple scattering
+  kOnScat=1   // turn on multiple scattering
+};
+
 class Propagator : public TObject{
  public:
   static Propagator *GetInstance();  // singleton class method
