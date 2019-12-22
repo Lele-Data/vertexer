@@ -70,6 +70,6 @@ void SimulManager::RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLay
         } // end of intersection check on second layer
       } // end of intersection check on first layer
     } // end of loop over particles
-    tree->Fill();                                         // fill the tree
+    tree->Fill();                                        // fill the tree
   } // end of loop over events
 }
