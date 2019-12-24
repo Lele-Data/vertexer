@@ -10,7 +10,7 @@
 #include <TTree.h>
 #include <TClonesArray.h>
 #include "Generator.h"
-#include "Propagator.h"
+#include "Transport.h"
 #include "BeamPipe.h"
 #include "Layer.h"
 
@@ -37,7 +37,7 @@ class SimulManager : public TObject{
   int fEtaMethod;      // number of the method chosen for eta generation
   int fMultScatMethod; // number of the method chosen for multiple scattering
   Generator *gen;      // MC generator (vertex and particle generation)
-  Propagator *prop;    // MC propagator (particle transport)
+  Transport *transp;    // MC propagator (particle transport)
 
  ClassDef(SimulManager,1);
 };
