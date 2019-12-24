@@ -39,7 +39,7 @@ SimulManager *SimulManager::Destroy(){
 }
 
 // The simulation algorithm
-void SimulManager::RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const{
+void SimulManager::RunSimulation(TTree *tree,VTX& vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const{
   double TmpZ=0.;                                        // temporary z used to compute hit
   double TmpPhi=0.;                                      // temporary phi used to compute hit
   for(int iEvent=0;iEvent<fEvent;++iEvent){ // loop over events

@@ -25,7 +25,7 @@ class SimulManager : public TObject{
  public:
   static SimulManager *GetInstance(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
   static SimulManager *Destroy();
-  void RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const;
+  void RunSimulation(TTree *tree,VTX& vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const;
  private:
   SimulManager();                    // (private) default constructor
   SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
