@@ -29,7 +29,7 @@ class Transport : public TObject{
   void ComputeHit(Particle particle,Layer *layer,double& zHit,double& phiHit);
  private:
   Transport();                       // (private) default constructor
-  Transport(const Transport& prop); // (private) copy constructor
+  Transport(const Transport& transp);// (private) copy constructor
   ~Transport();                      // (private) destructor
   static Transport *fInstance;       // The class instance
   double (*RandomScat[2])();

@@ -37,7 +37,7 @@ class SimulManager : public TObject{
   int fEtaMethod;      // number of the method chosen for eta generation
   int fMultScatMethod; // number of the method chosen for multiple scattering
   Generator *gen;      // MC generator (vertex and particle generation)
-  Transport *transp;    // MC propagator (particle transport)
+  Transport *transp;   // MC transport (particle transport)
 
  ClassDef(SimulManager,1);
 };
