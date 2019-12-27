@@ -22,9 +22,9 @@ void Compile(const char option='n') {
   gSystem->CompileMacro("src/Layer.cxx",opt.data(),"",BUILD_DIR);
   gSystem->CompileMacro("src/BeamPipe.cxx",opt.data(),"",BUILD_DIR);
   // Class for the MC generator and propagator
-  std::cout<<"Compile classes for the MC generator and propagator..."<<std::endl;
+  std::cout<<"Compile classes for the MC generator and transport..."<<std::endl;
   gSystem->CompileMacro("src/Generator.cxx",opt.data(),"",BUILD_DIR);
-  gSystem->CompileMacro("src/Propagator.cxx",opt.data(),"",BUILD_DIR);
+  gSystem->CompileMacro("src/Transport.cxx",opt.data(),"",BUILD_DIR);
   // Class for the MC simulation manager
   std::cout<<"Compile class for the MC simulation manager..."<<std::endl;
   gSystem->CompileMacro("src/SimulManager.cxx",opt.data(),"",BUILD_DIR);

@@ -1,9 +1,9 @@
-// Propagator.cxx
-// Implementation of Propagator.h
+// Transport.cxx
+// Implementation of Transport.h
 //
 // Author: Mario Ciacco & Emanuele Data
 
-#include "Propagator.h"
+#include "Transport.h"
 #include <TRandom3.h>
 #include <Riostream.h>
 #include <TMath.h>
@@ -11,33 +11,33 @@
 // #define DEBUG_MULT_SCAT
 // #define DEBUG_ROTATE
 
-ClassImp(Propagator);
+ClassImp(Transport);
 
-Propagator *Propagator::fInstance=NULL; // static data member
+Transport *Transport::fInstance=NULL; // static data member
 
 double ComputeT(double,double,double,double,double); // helper function
 void ComputePoint(Particle,double&,double&,double&,double);
 void Rotate(double,double,double,double,double*);
 
-Propagator::Propagator():TObject(){
+Transport::Transport():TObject(){
   RandomScat[0]=OffScattering;
   RandomScat[1]=Onscattering;
 }
 
-Propagator::~Propagator(){}
+Transport::~Transport(){}
 
-Propagator *Propagator::GetInstance(){
-  if(!Propagator::fInstance) fInstance=new Propagator();
+Transport *Transport::GetInstance(){
+  if(!Transport::fInstance) fInstance=new Transport();
   return fInstance;
 }
 
-Propagator *Propagator::Destroy(){
-  if(Propagator::fInstance) delete fInstance;
+Transport *Transport::Destroy(){
+  if(Transport::fInstance) delete fInstance;
   fInstance=NULL;
   return fInstance;
 }
 
-void Propagator::MultipleScattering(Particle& particle,int nScatMethod){
+void Transport::MultipleScattering(Particle& particle,int nScatMethod){
   double u[3]; // direction 
   double thp=(RandomScat[nScatMethod])(); // generate theta according to the multiple scattering distribution
   double php=gRandom->Rndm()*2*TMath::Pi(); // generate phi according to a uniform distribution in (0,2*pi
@@ -63,14 +63,14 @@ void Propagator::MultipleScattering(Particle& particle,int nScatMethod){
   particle.SetDirection(new_theta,new_phi);
 }
 
-void Propagator::Intersection(Particle& particle,Cylinder *cylinder){
+void Transport::Intersection(Particle& particle,Cylinder *cylinder){
   double x,y,z;
   double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),cylinder->GetRadius()+cylinder->GetThickness(),particle.GetX(),particle.GetY());
   ComputePoint(particle,x,y,z,t_val);
   particle.SetPoint(x,y,z);
 }
 
-Point2D Propagator::ComputeHit(Particle particle,Layer *layer){
+Point2D Transport::ComputeHit(Particle particle,Layer *layer){
   double x,y,z;
   double layer_length=layer->GetLength();
   double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetRadius(),particle.GetX(),particle.GetY());
@@ -79,7 +79,7 @@ Point2D Propagator::ComputeHit(Particle particle,Layer *layer){
   return hit;
 }
 
-void Propagator::ComputeHit(Particle particle,Layer *layer,double& zHit,double& phiHit){
+void Transport::ComputeHit(Particle particle,Layer *layer,double& zHit,double& phiHit){
   double x,y,z;
   double layer_length=layer->GetLength();
   double t_val=ComputeT(particle.GetTheta(),particle.GetPhi(),layer->GetRadius(),particle.GetX(),particle.GetY());
@@ -88,11 +88,11 @@ void Propagator::ComputeHit(Particle particle,Layer *layer,double& zHit,double& 
   phiHit=particle.GetPhi();
 }
 
-double Propagator::OffScattering(){
+double Transport::OffScattering(){
   return 0.;
 }
 
-double Propagator::Onscattering(){
+double Transport::Onscattering(){
   return gRandom->Gaus(0.,kRMSscat);  
 }  
 

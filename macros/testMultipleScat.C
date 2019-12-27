@@ -3,14 +3,14 @@
 #include <Riostream.h>
 #include "../src/Particle.h"
 #include "../src/Generator.h"
-#include "../src/Propagator.h"
+#include "../src/Transport.h"
 
 void testMultipleScat(){
   Generator *g=Generator::GetInstance();
-  Propagator *prop=Propagator::GetInstance();
+  Transport *transp=Transport::GetInstance();
   Particle p;
   g->GenerateParticle(p,EtaMethod::kHistEta);
-  prop->MultipleScattering(p,MultScatMethod::kOnScat);
-  prop=Propagator::Destroy();
+  transp->MultipleScattering(p,MultScatMethod::kOnScat);
+  transp=Transport::Destroy();
   g=Generator::Destroy();
 }

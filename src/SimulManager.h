@@ -10,7 +10,7 @@
 #include <TTree.h>
 #include <TClonesArray.h>
 #include "Generator.h"
-#include "Propagator.h"
+#include "Transport.h"
 #include "BeamPipe.h"
 #include "Layer.h"
 
@@ -25,7 +25,7 @@ class SimulManager : public TObject{
  public:
   static SimulManager *GetInstance(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
   static SimulManager *Destroy();
-  void RunSimulation(TTree *tree,VTX vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const;
+  void RunSimulation(TTree *tree,VTX& vert,TClonesArray& hitsFirstLayer,TClonesArray& hitsSecondLayer,BeamPipe *bpipe,Layer *layers[2]) const;
  private:
   SimulManager();                    // (private) default constructor
   SimulManager(int nEvent,int nMult,int nEta,int nScat,uint seed=12345);
@@ -37,7 +37,7 @@ class SimulManager : public TObject{
   int fEtaMethod;      // number of the method chosen for eta generation
   int fMultScatMethod; // number of the method chosen for multiple scattering
   Generator *gen;      // MC generator (vertex and particle generation)
-  Propagator *prop;    // MC propagator (particle transport)
+  Transport *transp;   // MC transport (particle transport)
 
  ClassDef(SimulManager,1);
 };
