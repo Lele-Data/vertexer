@@ -24,3 +24,11 @@ double Point2D::GetZ() const{
 double Point2D::GetPhi() const{
   return fPhi;
 }
+
+void Point2D::SetZ(double z){
+  fZ=z;
+}
+
+void Point2D::SetPhi(double phi){
+  fPhi=phi;
+}

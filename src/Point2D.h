@@ -14,6 +14,8 @@ class Point2D : public TObject{
   ~Point2D();
   double GetZ() const;
   double GetPhi() const;
+  void SetZ(double z);
+  void SetPhi(double phi);
  private:
   double fZ;
   double fPhi;

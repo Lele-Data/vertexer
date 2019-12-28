@@ -29,7 +29,7 @@ bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ,const dou
 
 }
 
-void Vertexer::FitVertex(Point2D *arrayHits,double& mean,double& rms,double zMin,double zMax) const{
+void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const{
 
 }
 
