@@ -47,10 +47,14 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBins,ResBins);
   TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
   TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  
+  // INSTANTIATE LAYERS
+  Layer *layers[2];
+  layers[0]=new Layer(4.,0.2,27.); // cm
+  layers[1]=new Layer(7.,0.0,27.); // cm
+
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
   RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,deltaNentries,zWidth);
-  manager->RunReconstruction(tree,vert,hitFirstLayer,hitSecondLayer,hZtrueMultRes,hZtrueMultNrec,hZtrueMultNsim);
+  manager->RunReconstruction(tree,vert,hitFirstLayer,hitSecondLayer,layers,hZtrueMultRes,hZtrueMultNrec,hZtrueMultNsim);
   manager=RecManager::Destroy();
   
   // WRITE AND CLOSE FILE
