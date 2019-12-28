@@ -28,4 +28,10 @@ void Compile(const char option='n') {
   // Class for the MC simulation manager
   std::cout<<"Compile class for the MC simulation manager..."<<std::endl;
   gSystem->CompileMacro("src/SimulManager.cxx",opt.data(),"",BUILD_DIR);
+  // Class for the vertexer
+  std::cout<<"Compile class for the vertexer..."<<std::endl;
+  gSystem->CompileMacro("src/Vertexer.cxx",opt.data(),"",BUILD_DIR);
+  // Class for the reconstruction manager
+  std::cout<<"Compile class for the reconstruction manager..."<<std::endl;
+  gSystem->CompileMacro("src/RecManager.cxx",opt.data(),"",BUILD_DIR);
 }
