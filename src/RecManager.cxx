@@ -92,8 +92,10 @@ void RecManager::RunReconstruction(TTree *tree,VTX vert,TClonesArray *hitsFirstL
     double mean=0.;                                                    // variable to save mean position of vertex
     double rms=0.;                                                     // variable to save rms of vertex
     if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ,fDeltaNentries)){         // check if vertex is found from histogram
+      // std::cout<<"reconstructing"<<std::endl;
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
+      std::cout<<mean<<std::endl;
       double res=mean-vert.Z;                                                         // compute the residue with respect to the true value
       hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
       hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
@@ -134,17 +136,16 @@ void RecManager::GenerateHitNoiseSoft(Point2D *arrayHit,Layer *layer,int hitCoun
 // This function is used to sort the array of z intersections
 void BubbleSort(double arr[],int size){
   int arr_index=0;
-  int* num_unsor=NULL;
-  *(num_unsor)=1;
-  while (*(num_unsor)>0) {
-    *(num_unsor)=0;
+  int num_unsor=1;
+  while (num_unsor>0) {
+    num_unsor=0;
     arr_index=0;
     for (;arr_index<size-1;++arr_index){
       if (arr[arr_index]>arr[arr_index+1]){
         arr[arr_index+1]+=arr[arr_index];
         arr[arr_index]=arr[arr_index+1]-arr[arr_index];
         arr[arr_index+1]-=arr[arr_index];
-        *(num_unsor)+=1;
+        num_unsor+=1;
       }
     }
   }

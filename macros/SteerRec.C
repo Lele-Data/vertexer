@@ -13,7 +13,7 @@
 
 const double kResMin=-2000.0;  // um
 const double kResMax=2000.0;   // um
-const int kNresBins=400;
+const int kNresBins=401;
 const int kNzTrueBins=18;
 const int kNmultBins=12;
 const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
@@ -37,7 +37,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   // OPEN FILE AND GET TREE
   TFile inFile(inFilename_ext.c_str());
   TFile outFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
-  TTree *tree = (TTree*)inFile.Get("T");
+  TTree *tree=(TTree*)inFile.Get("T");
   
   // GET TREE BRANCHES FROM EXISTING TREE
   TBranch *bVertMult=tree->GetBranch("vert");
@@ -53,9 +53,9 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   bSecondLayer->SetAutoDelete(kTRUE);
 
   // INSTANTIATE HISTOGRAMS
-  double ResBins[kNresBins];                          // define residues binning
-  double ResStep=(kResMax-kResMin)/(kNresBins);
-  for(int iBin=0;iBin<kNresBins+1;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
+  double ResBins[kNresBins];                        // define residues binning
+  double ResStep=(kResMax-kResMin)/(kNresBins-1);
+  for(int iBin=0;iBin<kNresBins;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
   TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBins,ResBins);
   TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
   TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
