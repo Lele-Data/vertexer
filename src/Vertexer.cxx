@@ -5,6 +5,7 @@
 
 #include <TMath.h>
 #include "Vertexer.h"
+#include <Riostream.h>
 
 ClassImp(Vertexer);
 
@@ -31,10 +32,12 @@ Vertexer *Vertexer::Destroy(){
 
 bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ,const double deltaNentries) const{
   int bFirstMax=FindFirstMaximum(hZrec);
+  zTmp=hZrec->GetBinCenter(bFirstMax);
+  // std::cout<<bFirstMax<<std::endl;
   int bSecondMax=FindSecondMaximum(hZrec,bFirstMax);
   double deltaZobs=fabs((double)(bFirstMax-bSecondMax))*hZrec->GetBinWidth(1); // compute the distance between the two highest bins
   if(deltaZobs<deltaZ){ // horizontal (z) cut
-    zTmp=hZrec->GetBinCenter(bFirstMax);
+    // std::cout<<"zTmp="<<zTmp<<std::endl;
     return true;
   }
   else {
@@ -68,23 +71,23 @@ void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,dou
   rms=TMath::Sqrt(rms);
 }
 
-double Vertexer::FindZintersect(Point2D p1,Point2D p2,double r1,double r2) const{
-  double z1=p1.GetZ();
-  double z2=p2.GetZ();
-  return (z2-z1)/(r2-r1)*r2+z2; // the intersection of a 2D (in the z-r plane) straight line with the z axis
+double Vertexer::FindZintersect(double z1,double z2,double r1,double r2) const{
+  return -(z2-z1)/(r2-r1)*r2+z2; // the intersection of a 2D (in the z-r plane) straight line with the z axis
 }
 
 int Vertexer::FindFirstMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
   for(int iBins=2;iBins<nBins;++iBins){
-    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax))
+    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)){
+      // std::cout<<"bin entry: "<<iBins<<"\t"<<hist->GetBinContent(iBins)<<"\t"<<hist->GetBinContent(nBinMax)<<std::endl; 
       nBinMax=iBins;
+    }
   }
   return nBinMax;
 }
 
-int Vertexer::FindSecondMaximum(TH1D* hist,int firstMaxBin){
+int Vertexer::FindSecondMaximum(TH1D* hist,const int firstMaxBin){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
   for(int iBins=2;iBins<nBins;++iBins){

@@ -7,6 +7,7 @@
 #include <TMath.h>
 #include "RecManager.h"
 #include <Riostream.h>
+#include <TFile.h>
 
 ClassImp(RecManager);
 
@@ -38,10 +39,11 @@ RecManager *RecManager::Destroy(){
   return fInstance;
 }
 
-void RecManager::RunReconstruction(TTree *tree,VTX vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const{
+void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const{
+  TFile file("histz.root","RECREATE");
   for(int iEvent=0;iEvent<tree->GetEntries();++iEvent){ // loop over events
     tree->GetEvent(iEvent);                             // process current event
-
+    std::cout<<"event "<<iEvent<<std::endl;
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
@@ -49,26 +51,27 @@ void RecManager::RunReconstruction(TTree *tree,VTX vert,TClonesArray *hitsFirstL
     int nHitNoiseLayer2=GenerateNhitNoise(kMeanNnoise);
     int nHitTotLayer1=nHitLayer1+nHitNoiseLayer1;                     // total number of hits
     int nHitTotLayer2=nHitLayer2+nHitNoiseLayer2;
-    Point2D *arrayHitFirstLayer=new Point2D[nHitTotLayer1];           // allocate memory for hit array
-    Point2D *arrayHitSecondLayer=new Point2D[nHitTotLayer2];
+    Point2D **arrayHitFirstLayer=new Point2D*[nHitTotLayer1];         // allocate memory for hit array
+    Point2D **arrayHitSecondLayer=new Point2D*[nHitTotLayer2];
 
     // APPLY SMEARING TO HITS ON LAYER 1 AND 2 AND GENERATE NOISE/SOFT HITS
     int hitCounterL1=0;
     int hitCounterL2=0;
     for(int iHitL1=0;iHitL1<nHitLayer1;++iHitL1){ // loop over hits of first layer
       Point2D *hitTmp=(Point2D*)hitsFirstLayer->At(iHitL1);
+      // std::cout<<hitTmp->GetZ()<<std::endl;
       Smearing(*hitTmp,layer[0]);
-      arrayHitFirstLayer[iHitL1]=*hitTmp;
+      arrayHitFirstLayer[iHitL1]=new Point2D(hitTmp->GetZ(),hitTmp->GetPhi());
       hitCounterL1++;
     } // end of loop over hits of first layer
     for(int iHitL2=0;iHitL2<nHitLayer2;++iHitL2){ // loop over hits of second layer
       Point2D *hitTmp=(Point2D*)hitsSecondLayer->At(iHitL2);
       Smearing(*hitTmp,layer[1]);
-      arrayHitSecondLayer[iHitL2]=*hitTmp;
+      arrayHitSecondLayer[iHitL2]=new Point2D(hitTmp->GetZ(),hitTmp->GetPhi());
       hitCounterL2++;
     } // end of loop over hits of second layer
-    GenerateHitNoiseSoft(arrayHitFirstLayer,layer[0],nHitTotLayer1,hitCounterL1); // generation of false hits for layer 1
-    GenerateHitNoiseSoft(arrayHitSecondLayer,layer[1],nHitTotLayer2,hitCounterL2);// generation of false hits for layer 2
+    GenerateHitNoiseSoft(arrayHitFirstLayer,layer[0],hitCounterL1,nHitTotLayer1); // generation of false hits for layer 1
+    GenerateHitNoiseSoft(arrayHitSecondLayer,layer[1],hitCounterL2,nHitTotLayer2);// generation of false hits for layer 2
 
     // DEFINE Z INTERSECTION HISTOGRAM PARAMENTERS
     int nBin=(kZmax-kZmin)/fZBinWidth;
@@ -79,14 +82,17 @@ void RecManager::RunReconstruction(TTree *tree,VTX vert,TClonesArray *hitsFirstL
     // LOOP TO FIND TRACKLETS INTERSECTIONS WITH Z AXIS
     for(int iHitL1=0;iHitL1<nHitTotLayer1;++iHitL1){ // loop over hit layer 1
       for(int iHitL2=0;iHitL2<nHitTotLayer2;++iHitL2){ // loop over hit layer 2
-        if(arrayHitSecondLayer[iHitL2].GetPhi()>=arrayHitFirstLayer[iHitL1].GetPhi()-0.5*fDeltaPhi && arrayHitSecondLayer[iHitL2].GetPhi()<=arrayHitFirstLayer[iHitL1].GetPhi()+0.5*fDeltaPhi){
-          double zInter=vertxr->FindZintersect(arrayHitFirstLayer[iHitL1],arrayHitSecondLayer[iHitL2],layer[0]->GetRadius(),layer[1]->GetRadius());
+        double phi1=arrayHitFirstLayer[iHitL1]->GetPhi();
+        double phi2=arrayHitSecondLayer[iHitL2]->GetPhi();
+        if(phi2>=phi1-0.5*fDeltaPhi && phi2<=phi1+0.5*fDeltaPhi){
+          double zInter=vertxr->FindZintersect(arrayHitFirstLayer[iHitL1]->GetZ(),arrayHitSecondLayer[iHitL2]->GetZ(),layer[0]->GetRadius(),layer[1]->GetRadius());
+          // std::cout<<"intersection: "<<zInter<<"\tphi1="<<arrayHitFirstLayer[iHitL1]->GetPhi()<<"\tphi2="<<arrayHitSecondLayer[iHitL2]->GetPhi()<<std::endl;
           hZrec->Fill(zInter);
           zIntersectionTrack[zInterCounter++]=zInter;
         }
       } // end of loop over hit layer 2
     } // end of loop over hit layer 1
-
+    
     // FIND AND FIT VERTEX
     double zTmp=0.;                                                    // variable to find the peak of histogram
     double mean=0.;                                                    // variable to save mean position of vertex
@@ -95,19 +101,29 @@ void RecManager::RunReconstruction(TTree *tree,VTX vert,TClonesArray *hitsFirstL
       // std::cout<<"reconstructing"<<std::endl;
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
-      std::cout<<mean<<std::endl;
+      std::cout<<"zTmp="<<zTmp<<"\tzMean"<<mean<<"\tzTrue="<<vert.Z<<std::endl;
       double res=mean-vert.Z;                                                         // compute the residue with respect to the true value
       hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
       hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
     }
     hZtrueMultNsim->Fill(vert.Z,vert.Mult);                                           // increment entries in hZtrueMultNsim histogram
 
+    // SAVE HIST ON DEBUG FILE
+    if(iEvent%100==0){
+    TString hName;
+    hName.Form("hZrec_%d",iEvent);
+    file.cd();
+    hZrec->Write(hName);}
+
     // FREE MEMORY
     delete hZrec;
+    for(int iHit1=0;iHit1<nHitTotLayer1;++iHit1) {if(arrayHitFirstLayer[iHit1]){delete arrayHitFirstLayer[iHit1];}}
+    for(int iHit2=0;iHit2<nHitTotLayer2;++iHit2) {if(arrayHitSecondLayer[iHit2])delete arrayHitSecondLayer[iHit2];}
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
-
   } // end loop over events
+  file.Write();
+  file.Close();
 }
 
 void RecManager::Smearing(Point2D& hit,Layer *layer) const{
@@ -123,13 +139,13 @@ int RecManager::GenerateNhitNoise(int meanNoiseNumber) const{
   return gRandom->Poisson(meanNoiseNumber);
 }
 
-void RecManager::GenerateHitNoiseSoft(Point2D *arrayHit,Layer *layer,int hitCounter,int nHitTot) const{
+void RecManager::GenerateHitNoiseSoft(Point2D **arrayHit,Layer *layer,int hitCounter,int nHitTot) const{
   double length=layer->GetLength();
   for(int iHit=hitCounter;iHit<nHitTot;iHit++){
     double z=-length/2.+length*gRandom->Rndm();
     double phi=2.*TMath::Pi()*gRandom->Rndm();
-    Point2D newHit(z,phi);
-    arrayHit[iHit]=newHit;
+    arrayHit[iHit]=new Point2D(z,phi);
+    /*if(arrayHit[iHit])std::cout<<"add point"<<std::endl;*/
   }
 }
 
