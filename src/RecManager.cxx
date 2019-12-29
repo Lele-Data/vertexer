@@ -76,6 +76,7 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     // DEFINE Z INTERSECTION HISTOGRAM PARAMENTERS
     int nBin=(kZmax-kZmin)/fZBinWidth;
     TH1D *hZrec=new TH1D("hZrec","hZrec",nBin,kZmin,kZmax);           // instantiate tracklets z intersection histogram
+    hZrec->SetDirectory(0);                                           // avoid segmentation fault giving owner
     double zIntersectionTrack[nMaxInter]={0};                         // instantiate array for intersection
     int zInterCounter=0;                                              // counter of tracklets intersection
 
@@ -101,7 +102,7 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
       // std::cout<<"reconstructing"<<std::endl;
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
-      std::cout<<"zTmp="<<zTmp<<"\tzMean"<<mean<<"\tzTrue="<<vert.Z<<std::endl;
+      // std::cout<<"zTmp="<<zTmp<<"\tzMean="<<mean<<"\tzTrue="<<vert.Z<<std::endl;
       double res=mean-vert.Z;                                                         // compute the residue with respect to the true value
       hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
       hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
