@@ -8,7 +8,7 @@
 
 ClassImp(Layer);
 
-Layer::Layer(double radius,double thickness,double length):Cylinder(radius,thickness),
+Layer::Layer(double radius,double thickness,double length,double zresol,double rphiresol):Cylinder(radius,thickness),
 fLength(length){
   // constructor
 }
@@ -23,4 +23,12 @@ void Layer::PrintCylinderType() const{
 
 double Layer::GetLength() const{
   return fLength;
+}
+
+double Layer::GetZresol() const{
+  return fZresol;
+}
+
+double Layer::GetRphiResol() const{
+  return fRphiResol;
 }

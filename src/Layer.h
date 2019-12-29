@@ -10,12 +10,16 @@
 
 class Layer : public Cylinder{
  public:
-  Layer(double radius=0.,double thickness=0.,double length=0.);  
+  Layer(double radius=0.,double thickness=0.,double length=0.,double zresol=0.,double rphiresol=0.);  
   ~Layer();  
   virtual void PrintCylinderType() const;
   double GetLength() const;
+  double GetZresol() const;
+  double GetRphiResol() const;
  private:
   double fLength;
+  double fZresol;    // z resolution
+  double fRphiResol; // r-phi resolution
   
  ClassDef(Layer,1);
 };
