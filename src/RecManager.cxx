@@ -6,6 +6,7 @@
 #include <TRandom3.h>
 #include <TMath.h>
 #include "RecManager.h"
+#include <Riostream.h>
 
 ClassImp(RecManager);
 
