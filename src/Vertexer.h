@@ -14,7 +14,7 @@ class Vertexer : public TObject{
  public:
   static Vertexer *GetInstance();                           // singleton class method
   static Vertexer *Destroy();                               // singleton class method
-  bool FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ,const double deltaNentries) const;
+  bool FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const;
   void FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const;
   double FindZintersect(double z1,double z2,double r1,double r2) const; 
  private:
@@ -22,7 +22,7 @@ class Vertexer : public TObject{
   Vertexer(const Vertexer& gen);                            // (private) copy constructor
   ~Vertexer();                                              // (private) destructor
   static int FindFirstMaximum(TH1D* hist);                  // find the bin of the first highest maximum
-  static int FindSecondMaximum(TH1D* hist,int firstMaxBin); // find the bin of the second highest maximum
+  static int FindSecondMaximum(TH1D* hist);                 // find the bin of the second highest maximum
   static Vertexer *fInstance;                               // The class instance
 
  ClassDef(Vertexer,1);

@@ -30,21 +30,14 @@ Vertexer *Vertexer::Destroy(){
   return fInstance;
 }
 
-bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ,const double deltaNentries) const{
+bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
   int bFirstMax=FindFirstMaximum(hZrec);
   zTmp=hZrec->GetBinCenter(bFirstMax);
-  // std::cout<<bFirstMax<<std::endl;
-  int bSecondMax=FindSecondMaximum(hZrec,bFirstMax);
+  int bSecondMax=FindSecondMaximum(hZrec);
   double deltaZobs=fabs((double)(bFirstMax-bSecondMax))*hZrec->GetBinWidth(1); // compute the distance between the two highest bins
-  if(deltaZobs<deltaZ){ // horizontal (z) cut
-    // std::cout<<"zTmp="<<zTmp<<std::endl;
+  if(deltaZobs<deltaZ) // horizontal (z) cut
     return true;
-  }
-  else {
-    double deltaNentrObs=hZrec->GetBinContent(bFirstMax)-hZrec->GetBinContent(bSecondMax);
-    if(deltaNentrObs>deltaNentries) return true;
-    return false;
-  }
+  return false;
 }
 
 void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const{
@@ -88,19 +81,17 @@ int Vertexer::FindFirstMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
   for(int iBins=2;iBins<=nBins;++iBins){
-    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)){
-      // std::cout<<"bin entry: "<<iBins<<"\t"<<hist->GetBinContent(iBins)<<"\t"<<hist->GetBinContent(nBinMax)<<std::endl; 
+    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax))
       nBinMax=iBins;
-    }
   }
   return nBinMax;
 }
 
-int Vertexer::FindSecondMaximum(TH1D* hist,const int firstMaxBin){
+int Vertexer::FindSecondMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
-  int nBinMax=1;
-  for(int iBins=2;iBins<=nBins;++iBins){
-    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)&&hist->GetBinContent(iBins)<hist->GetBinContent(firstMaxBin))
+  int nBinMax=nBins;
+  for(int iBins=nBins-1;iBins>0;--iBins){
+    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)) 
       nBinMax=iBins;
   }
   return nBinMax;

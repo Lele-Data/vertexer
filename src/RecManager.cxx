@@ -9,7 +9,7 @@
 #include <Riostream.h>
 #include <TFile.h>
 
-#define DEBUG_1
+// #define DEBUG_1
 
 ClassImp(RecManager);
 
@@ -17,11 +17,10 @@ RecManager *RecManager::fInstance=NULL; // static data member
 
 void BubbleSort(double arr[],int size); // helper function
 
-RecManager::RecManager(double deltaPhi,double zBinWidth,double deltaZ,double deltaNentries,double zWidth):TObject(),
+RecManager::RecManager(double deltaPhi,double zBinWidth,double deltaZ,double zWidth):TObject(),
 fDeltaPhi(deltaPhi),           // phi slice width
 fZBinWidth(zBinWidth),         // bin width  
 fDeltaZ(deltaZ),               // horizontal cut
-fDeltaNentries(deltaNentries), // vertical cut
 fZWidth(zWidth){               // centroid width
   vertxr=Vertexer::GetInstance();
 }
@@ -30,8 +29,8 @@ RecManager::~RecManager(){
   vertxr=Vertexer::Destroy();
 }
 
-RecManager *RecManager::GetInstance(double deltaPhi,double zBinWidth,double deltaZ,double deltaNentries,double zWidth){
-  if(!RecManager::fInstance) fInstance=new RecManager(deltaPhi,zBinWidth,deltaZ,deltaNentries,zWidth);
+RecManager *RecManager::GetInstance(double deltaPhi,double zBinWidth,double deltaZ,double zWidth){
+  if(!RecManager::fInstance) fInstance=new RecManager(deltaPhi,zBinWidth,deltaZ,zWidth);
   return fInstance;
 }
 
@@ -42,11 +41,12 @@ RecManager *RecManager::Destroy(){
 }
 
 void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const{
-  TFile file("histz.root","RECREATE");
+  #ifdef DEBUG_1
+    TFile file("histz.root","RECREATE");
+  #endif // DEBUG_1
   for(int iEvent=0;iEvent<tree->GetEntries();++iEvent){ // loop over events
     tree->GetEvent(iEvent);                             // process current event
-    //std::cout<<"event "<<iEvent<<std::endl;
-
+    
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
@@ -62,15 +62,14 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     int hitCounterL2=0;
     for(int iHitL1=0;iHitL1<nHitLayer1;++iHitL1){ // loop over hits of first layer
       Point2D *hitTmp=(Point2D*)hitsFirstLayer->At(iHitL1);
-      // std::cout<<hitTmp->GetZ()<<std::endl;
-      Smearing(*hitTmp,layer[0]);
       arrayHitFirstLayer[iHitL1]=new Point2D(hitTmp->GetZ(),hitTmp->GetPhi());
+      Smearing(arrayHitFirstLayer[iHitL1],layer[0]);
       hitCounterL1++;
     } // end of loop over hits of first layer
     for(int iHitL2=0;iHitL2<nHitLayer2;++iHitL2){ // loop over hits of second layer
       Point2D *hitTmp=(Point2D*)hitsSecondLayer->At(iHitL2);
-      Smearing(*hitTmp,layer[1]);
       arrayHitSecondLayer[iHitL2]=new Point2D(hitTmp->GetZ(),hitTmp->GetPhi());
+      Smearing(arrayHitSecondLayer[iHitL2],layer[1]);
       hitCounterL2++;
     } // end of loop over hits of second layer
     GenerateHitNoiseSoft(arrayHitFirstLayer,layer[0],hitCounterL1,nHitTotLayer1); // generation of false hits for layer 1
@@ -90,7 +89,6 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
         double phi2=arrayHitSecondLayer[iHitL2]->GetPhi();
         if(phi2>=phi1-0.5*fDeltaPhi && phi2<=phi1+0.5*fDeltaPhi){
           double zInter=vertxr->FindZintersect(arrayHitFirstLayer[iHitL1]->GetZ(),arrayHitSecondLayer[iHitL2]->GetZ(),layer[0]->GetRadius(),layer[1]->GetRadius());
-          // std::cout<<"intersection: "<<zInter<<"\tphi1="<<arrayHitFirstLayer[iHitL1]->GetPhi()<<"\tphi2="<<arrayHitSecondLayer[iHitL2]->GetPhi()<<std::endl;
           hZrec->Fill(zInter);
           zIntersectionTrack[zInterCounter++]=zInter;
         }
@@ -101,12 +99,10 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     double zTmp=0.;                                                    // variable to find the peak of histogram
     double mean=0.;                                                    // variable to save mean position of vertex
     double rms=0.;                                                     // variable to save rms of vertex
-    if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ,fDeltaNentries)){         // check if vertex is found from histogram
-      // std::cout<<"reconstructing"<<std::endl;
+    if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ)){         // check if vertex is found from histogram
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
-      // std::cout<<"zTmp="<<zTmp<<"\tzMean="<<mean<<"\tzTrue="<<vert.Z<<std::endl;
-      double res=(mean-vert.Z)*10000;                                                 // compute the residue with respect to the true value (um)
+      double res=(mean-vert.Z)*10000.;                                                // compute the residue with respect to the true value (um)
       hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
       hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
     }
@@ -114,11 +110,11 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
 
     // SAVE HIST ON DEBUG FILE
     #ifdef DEBUG_1
-    if(iEvent%100==0){
-    TString hName;
-    hName.Form("hZrec_%d",iEvent);
-    file.cd();
-    hZrec->Write(hName);}
+      if(kFALSE){
+      TString hName;
+      hName.Form("hZrec_%d",iEvent);
+      file.cd();
+      hZrec->Write(hName);}
     #endif // DEBUG_1
 
     // FREE MEMORY
@@ -128,17 +124,20 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
   } // end loop over events
-  file.Write();
-  file.Close();
+  #ifdef DEBUG_1
+    file.Write();
+    file.Close();
+  #endif // DEBUG_1
 }
 
-void RecManager::Smearing(Point2D& hit,Layer *layer) const{
-  double z=hit.GetZ();
-  double phi=hit.GetPhi();
-  double new_z=z+gRandom->Gaus(0,layer->GetZresol());
+void RecManager::Smearing(Point2D *hit,Layer *layer) const{
+  double z=hit->GetZ();
+  double phi=hit->GetPhi();
+  double Zres=layer->GetZresol();
+  double new_z=gRandom->Gaus(z,Zres);
   double new_phi=phi+gRandom->Gaus(0,layer->GetRphiResol())/layer->GetRadius();
-  hit.SetZ(new_z);
-  hit.SetPhi(new_phi);
+  hit->SetZ(new_z);
+  hit->SetPhi(new_phi);
 }
 
 int RecManager::GenerateNhitNoise(int meanNoiseNumber) const{
@@ -151,7 +150,6 @@ void RecManager::GenerateHitNoiseSoft(Point2D **arrayHit,Layer *layer,int hitCou
     double z=-length/2.+length*gRandom->Rndm();
     double phi=2.*TMath::Pi()*gRandom->Rndm();
     arrayHit[iHit]=new Point2D(z,phi);
-    /*if(arrayHit[iHit])std::cout<<"add point"<<std::endl;*/
   }
 }
 

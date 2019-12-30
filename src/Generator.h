@@ -11,9 +11,10 @@
 #include "Particle.h"
 
 const double kMaxMultiplicity=60.;
+const double kConstMultiplicity=3.;
 const double kSigX=0.01; // cm
 const double kSigY=0.01; // cm
-const double kSigZ=5.00; // cm
+const double kSigZ=5.30; // cm
 
 enum MultMethod{
   kUnifMult=0, // generate multiplicity uniformly between 0 and max multiplicity

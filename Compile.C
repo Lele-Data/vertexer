@@ -8,7 +8,13 @@
 
 const char *BUILD_DIR="build"; // build directory name
 
+#ifndef FILEDIR
+#define FILEDIR
+const char *FILE_DIR="results/"; // result files directory
+#endif // FILEDIR
+
 void Compile(const char option='n') {
+  gSystem->mkdir(FILE_DIR); // make build directory
   gSystem->mkdir(BUILD_DIR); // make build directory
   std::string opt="kg";
   if(option=='f') opt="kfg";
@@ -34,4 +40,9 @@ void Compile(const char option='n') {
   // Class for the reconstruction manager
   std::cout<<"Compile class for the reconstruction manager..."<<std::endl;
   gSystem->CompileMacro("src/RecManager.cxx",opt.data(),"",BUILD_DIR);
+  // load macros
+  std::cout<<"Load macros..."<<std::endl;
+  gROOT->LoadMacro("macros/SteerSimul.C");
+  gROOT->LoadMacro("macros/SteerRec.C");
+  gROOT->LoadMacro("macros/CreateHist.C");
 }

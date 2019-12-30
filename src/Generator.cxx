@@ -20,9 +20,9 @@ Generator::Generator():TObject(){
   TFile kin("files/kinem.root");
   hMult=(TH1F*)kin.Get("hmul");
   TH1F* hEtaNotRes=(TH1F*)kin.Get("heta");
-  hMult->SetDirectory(0); // ROOT is the owner of this histogram
+  hMult->SetDirectory(0);
   hEta=GetResizedHistogram(hEtaNotRes,-2.,2.);
-  hEta->SetDirectory(0); // ROOT is the owner of this histogram
+  hEta->SetDirectory(0);
   kin.Close();
   RandomEta[0]=UniformEta;
   RandomEta[1]=HistEta;
@@ -77,7 +77,7 @@ double Generator::UniformMultiplicity(){
 
 double Generator::HistMultiplicity(){return hMult->GetRandom();}
 
-double Generator::ConstantMultiplicity(){return kMaxMultiplicity;}
+double Generator::ConstantMultiplicity(){return kConstMultiplicity;}
 
 TH1F* GetResizedHistogram(TH1F* disteta,double xmin,double xmax){
   TAxis *xa=disteta->GetXaxis();

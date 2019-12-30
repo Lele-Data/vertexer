@@ -15,25 +15,29 @@
 #define CONSTANT
 const double kResMin=-1000.; // um
 const double kResMax=1000.;  // um
-const int kNresBinLim=501;
+const int kNresBinLim=401;
 const int kNzTrueBins=18;
 const int kNmultBins=12;
 const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
 const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
 #endif // CONSTANT
 
-const double kDeltaPhi=0.0005;
-const double kZbinWidth=0.01;
-const double kDeltaZ=0.05;
-const double kDeltaNentries=2.;
+#ifndef FILEDIR
+#define FILEDIR
+const char *FILE_DIR="results/";
+#endif // FILEDIR
+
+const double kDeltaPhi=0.005;
+const double kZbinWidth=0.04;
+const double kDeltaZ=0.08;
 const double kZwidth=0.1;
 
-void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double deltaNentries=kDeltaNentries,double zWidth=kZwidth){
-  std::string inFilename_ext=inFilename+".root";      // filename with *.root extension
-  std::string outFilename_ext=outFilename+".root";    // filename with *.root extension
+void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double zWidth=kZwidth){
+  std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
+  std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
   
   // DECLARE MEMORY LOCATION
-  static VTX vert;
+  static VTX vert={0,0,0,0};
   TClonesArray *hitsFirstLayer=new TClonesArray("Point2D",100);
   TClonesArray *hitsSecondLayer=new TClonesArray("Point2D",100);
 
@@ -69,7 +73,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   layers[1]=new Layer(7.,0.0,27.,kZresol,kRphiResol); // cm
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
-  RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,deltaNentries,zWidth);
+  RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth);
   manager->RunReconstruction(tree,vert,hitsFirstLayer,hitsSecondLayer,layers,hZtrueMultRes,hZtrueMultNrec,hZtrueMultNsim);
   manager=RecManager::Destroy();
   
