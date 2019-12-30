@@ -11,19 +11,22 @@
 #include "../src/SimulManager.h"
 #include "../src/RecManager.h"
 
-const double kResMin=-10.0;  // cm
-const double kResMax=10.0;   // cm
-const int kNresBinLim=401;
+#ifndef CONSTANT
+#define CONSTANT
+const double kResMin=-1000.; // um
+const double kResMax=1000.;  // um
+const int kNresBinLim=501;
 const int kNzTrueBins=18;
 const int kNmultBins=12;
 const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
 const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
+#endif // CONSTANT
 
-const double kDeltaPhi=0.005;
-const double kZbinWidth=0.001;
+const double kDeltaPhi=0.0005;
+const double kZbinWidth=0.01;
 const double kDeltaZ=0.05;
 const double kDeltaNentries=2.;
-const double kZwidth=0.02;
+const double kZwidth=0.1;
 
 void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double deltaNentries=kDeltaNentries,double zWidth=kZwidth){
   std::string inFilename_ext=inFilename+".root";      // filename with *.root extension

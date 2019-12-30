@@ -9,6 +9,8 @@
 #include <Riostream.h>
 #include <TFile.h>
 
+#define DEBUG_1
+
 ClassImp(RecManager);
 
 RecManager *RecManager::fInstance=NULL; // static data member    
@@ -43,7 +45,8 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
   TFile file("histz.root","RECREATE");
   for(int iEvent=0;iEvent<tree->GetEntries();++iEvent){ // loop over events
     tree->GetEvent(iEvent);                             // process current event
-    std::cout<<"event "<<iEvent<<std::endl;
+    //std::cout<<"event "<<iEvent<<std::endl;
+
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
@@ -103,18 +106,20 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
       // std::cout<<"zTmp="<<zTmp<<"\tzMean="<<mean<<"\tzTrue="<<vert.Z<<std::endl;
-      double res=mean-vert.Z;                                                         // compute the residue with respect to the true value
+      double res=(mean-vert.Z)*10000;                                                 // compute the residue with respect to the true value (um)
       hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
       hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
     }
     hZtrueMultNsim->Fill(vert.Z,vert.Mult);                                           // increment entries in hZtrueMultNsim histogram
 
     // SAVE HIST ON DEBUG FILE
+    #ifdef DEBUG_1
     if(iEvent%100==0){
     TString hName;
     hName.Form("hZrec_%d",iEvent);
     file.cd();
     hZrec->Write(hName);}
+    #endif // DEBUG_1
 
     // FREE MEMORY
     delete hZrec;

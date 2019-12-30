@@ -32,6 +32,8 @@ Generator::Generator():TObject(){
 }
 
 Generator::~Generator(){
+  delete hEta;
+  delete hMult;
 }
 
 Generator *Generator::GetInstance(){

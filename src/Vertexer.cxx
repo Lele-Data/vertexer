@@ -71,6 +71,15 @@ void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,dou
   rms=TMath::Sqrt(rms);
 }
 
+// ^ r
+// .        .
+// .       .   (r2,z2)
+// .      .
+// .     .   (r1,z1)
+// .    .
+// -------------> z
+// (z-z2)=(z2-z1)/(r2-r1)*(r-r2)
+
 double Vertexer::FindZintersect(double z1,double z2,double r1,double r2) const{
   return -(z2-z1)/(r2-r1)*r2+z2; // the intersection of a 2D (in the z-r plane) straight line with the z axis
 }
@@ -78,7 +87,7 @@ double Vertexer::FindZintersect(double z1,double z2,double r1,double r2) const{
 int Vertexer::FindFirstMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
-  for(int iBins=2;iBins<nBins;++iBins){
+  for(int iBins=2;iBins<=nBins;++iBins){
     if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)){
       // std::cout<<"bin entry: "<<iBins<<"\t"<<hist->GetBinContent(iBins)<<"\t"<<hist->GetBinContent(nBinMax)<<std::endl; 
       nBinMax=iBins;
@@ -90,7 +99,7 @@ int Vertexer::FindFirstMaximum(TH1D* hist){
 int Vertexer::FindSecondMaximum(TH1D* hist,const int firstMaxBin){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
-  for(int iBins=2;iBins<nBins;++iBins){
+  for(int iBins=2;iBins<=nBins;++iBins){
     if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)&&hist->GetBinContent(iBins)<hist->GetBinContent(firstMaxBin))
       nBinMax=iBins;
   }

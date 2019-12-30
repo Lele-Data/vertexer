@@ -17,7 +17,7 @@
 
 const double kZresol=0.0120;   // cm
 const double kRphiResol=0.0030;// cm
-const int kMeanNnoise=5.;     // mean number of generated false hits
+const int kMeanNnoise=0.;     // mean number of generated false hits
 const double kZmax=30.0;       // lower limit for the histogram  
 const double kZmin=-30.0;      // upper limit for the histogram
 const int nMaxInter = 10000;   // size of array for tracklets intersection with z
