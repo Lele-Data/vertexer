@@ -10,7 +10,7 @@
 #include <TClonesArray.h>
 #include "../src/SimulManager.h"
 
-void SteerSimul(std::string filename="simul",const char *treename="tree",const int nEvent=1000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=12345){
+void SteerSimul(std::string filename="simul",const char *treename="tree",const int nEvent=1000,double nMult=MultMethod::kConstMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=12345){
   const int nHits=kMaxMultiplicity;                  // the maximum number of expoected hits (in Generator.h)
   std::string filename_ext=filename+".root";         // filename with *.root extension
   
