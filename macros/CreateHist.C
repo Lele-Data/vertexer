@@ -8,22 +8,9 @@
 #include <TLatex.h>
 #include <TCanvas.h>
 #include <TF1.h>
+#include "../cfg/Constants.h"
 
-#ifndef CONSTANT
-#define CONSTANT
-const double kResMin=-1000.; // um
-const double kResMax=1000.;  // um
-const int kNresBinLim=401;
-const int kNzTrueBins=18;
-const int kNmultBins=12;
-const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
-const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
-#endif // CONSTANT
-
-#ifndef FILEDIR
-#define FILEDIR
-const char *FILE_DIR="results/";
-#endif // FILEDIR
+const double kDeltaZtrue=4;
 
 void CreateHist(std::string inFilename="recResult",std::string outFilename="HistResult_Eff_Reso"){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
@@ -36,14 +23,18 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   gStyle->SetDrawOption("PE");
   
   // OPEN FILE AND GET HISTOGRAMS
-  TFile *inFile=new TFile(inFilename_ext.c_str());
+  TFile inFile(inFilename_ext.c_str());
+  if(!inFile.IsOpen()){
+    std::cout<<"No input file!"<<std::endl;
+    return;
+  }
   TFile *outFile=new TFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
-  TH3D *hZtrueMultRes=(TH3D*)inFile->Get("hZtrueMultRes");
+  TH3D *hZtrueMultRes=(TH3D*)inFile.Get("hZtrueMultRes");
   hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
   hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
-  TH2D *hZtrueMultNrec=(TH2D*)inFile->Get("hZtrueMultNrec");
-  TH2D *hZtrueMultNsim=(TH2D*)inFile->Get("hZtrueMultNsim");
+  TH2D *hZtrueMultNrec=(TH2D*)inFile.Get("hZtrueMultNrec");
+  TH2D *hZtrueMultNsim=(TH2D*)inFile.Get("hZtrueMultNsim");
   
   // CREATE HISTOGRAMS FOR EFFICIENCY
   TH1D *hZtrueNrec=hZtrueMultNrec->ProjectionX("hZtrueNrec",1,kNmultBins);
@@ -56,7 +47,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   hMultEff->GetXaxis()->SetTitle("Multiplicity");
   
   // COMPUTE EFFICIENCY vs Ztrue
-  for(int iZtrue=1;iZtrue<=kNzTrueBins;iZtrue++){
+  for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
     if(hZtrueNsim->GetBinContent(iZtrue)<1.e-9) continue;
     double n_tot=hZtrueNsim->GetBinContent(iZtrue);
     double n_rec=hZtrueNrec->GetBinContent(iZtrue);
@@ -92,21 +83,41 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   projectionOnRes->SetTitle(histTitleRes);
   projectionOnRes->Write();
 
+  // DECLARE RESOLUTION HISTOGRAMS
+  TH1D *hMultResol=new TH1D("hMultResol","Resolution vs. Multiplicity",kNmultBins,kMultBins);
+  TH1D *hZtrueResol=new TH1D("hZtrueResol","Resolution vs. Z_{true}",kNzTrueBins,kZtrueBins);
+
+  TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
   for(int iMult=1;iMult<=kNmultBins;iMult++){
-    sprintf(histNameRes,"hZtrueMultRes_projRes_%d",iMult);
+    sprintf(histNameRes,"hZtrueMultRes_projResMult_%d",iMult);
     sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(iMult),hZtrueMultRes->GetYaxis()->GetBinUpEdge(iMult));
-    TH1D *projectionOnRes=hZtrueMultRes->ProjectionZ(histNameRes,1,kNzTrueBins,iMult,iMult);
-    projectionOnRes->SetTitle(histTitleRes);
-    TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax);
+    TH1D *projectionOnRes_mult=hZtrueMultRes->ProjectionZ(histNameRes,1,kNzTrueBins,iMult,iMult);
+    projectionOnRes_mult->SetTitle(histTitleRes);
     // GAUSSIAN FIT TO GET RESOLUTION
-    fitFun->SetParLimits(0,0.,1.e8);
-    fitFun->SetParLimits(1,-50.,50.);
-    fitFun->SetParLimits(2,0.,500.);
-    projectionOnRes->Fit(fitFun);
-    projectionOnRes->Write();
+    fitFun->SetParLimits(0,0.,1.e9);
+    fitFun->SetParLimits(1,-100.,100.);
+    fitFun->SetParLimits(2,0.,600.);
+    projectionOnRes_mult->Fit(fitFun,"q");
+    projectionOnRes_mult->Write();
+    hMultResol->SetBinContent(iMult,fitFun->GetParameter(2));
+    hMultResol->SetBinError(iMult,fitFun->GetParError(2));
   }
-  
+  hMultResol->Write();
+  for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
+    sprintf(histNameRes,"hZtrueMultRes_projResZtrue_%d",iZtrue);
+    TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
+    // GAUSSIAN FIT TO GET RESOLUTION
+    fitFun->SetParLimits(0,0.,1.e9);
+    fitFun->SetParLimits(1,-100.,100.);
+    fitFun->SetParLimits(2,0.,600.);
+    projectionOnRes_ztrue->Fit(fitFun,"q");
+    projectionOnRes_ztrue->Write();
+    hZtrueResol->SetBinContent(iZtrue,fitFun->GetParameter(2));
+    hZtrueResol->SetBinError(iZtrue,fitFun->GetParError(2));
+  }
+  hZtrueResol->Write();
   // WRITE AND CLOSE FILE
   outFile->Close();
+  inFile.Close();
 }
 

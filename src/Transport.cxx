@@ -8,9 +8,6 @@
 #include <Riostream.h>
 #include <TMath.h>
 
-// #define DEBUG_MULT_SCAT
-// #define DEBUG_ROTATE
-
 ClassImp(Transport);
 
 Transport *Transport::fInstance=NULL; // static data member
@@ -41,25 +38,13 @@ void Transport::MultipleScattering(Particle& particle,int nScatMethod){
   double u[3]; // direction 
   double thp=(RandomScat[nScatMethod])(); // generate theta according to the multiple scattering distribution
   double php=gRandom->Rndm()*2*TMath::Pi(); // generate phi according to a uniform distribution in (0,2*pi
-  #ifdef DEBUG_MULT_SCAT
-    std::cout<<"angolo generato "<<thp<<std::endl;
-    std::cout<<"theta "<<particle.GetTheta()<<", phi "<<particle.GetPhi()<<std::endl;
-  #endif // DEBUG_MULT_SCAT
   Rotate(particle.GetTheta(),particle.GetPhi(),thp,php,u);
-  #ifdef DEBUG_MULT_SCAT
-    std::cout<<"_______________in S_________________"<<std::endl;
-    std::cout<<"x "<<u[0]<<" y "<<u[1]<<" z "<<u[2]<<std::endl;
-    std::cout<<"____________________________________"<<std::endl;
-  #endif // DEBUG_MULT_SCAT
   // compute the theta and phi of the particle in the lab frame
   double new_theta=TMath::ATan(TMath::Sqrt(u[0]*u[0]+u[1]*u[1])/u[2]);
   if(new_theta<0) new_theta+=TMath::Pi();
   double new_phi=TMath::ATan(u[1]/u[0]);
   if(u[0]<0) new_phi+=TMath::Pi();
   else if(u[0]>=0 && u[1]<0) new_phi+=2.*TMath::Pi();
-  #ifdef DEBUG_MULT_SCAT
-    std::cout<<"theta new "<<new_theta<<", phi new "<<new_phi<<std::endl;
-  #endif // DEBUG_MULT_SCAT
   particle.SetDirection(new_theta,new_phi);
 }
 
@@ -136,11 +121,6 @@ void Rotate(double th,double ph,double thp,double php,double* u){
   up[0]=sin(thp)*cos(php);
   up[1]=sin(thp)*sin(php);
   up[2]=cos(thp);
-  #ifdef DEBUG_ROTATE
-    std::cout<<"_______________in S'_________________"<<std::endl;
-    std::cout<<"x' "<<up[0]<<" y' "<<up[1]<<" z' "<<up[2]<<std::endl;
-    std::cout<<"_____________________________________"<<std::endl;
-  #endif // DEBUG_ROTATE
   // matrix multiplication
   for(int i=0;i<3;i++){
     u[i]=0;

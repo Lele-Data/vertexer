@@ -6,12 +6,7 @@
 #include <Riostream.h>
 #include <string>
 
-const char *BUILD_DIR="build"; // build directory name
-
-#ifndef FILEDIR
-#define FILEDIR
-const char *FILE_DIR="results/"; // result files directory
-#endif // FILEDIR
+#include "../cfg/Constants.h"
 
 void Compile(const char option='n') {
   gSystem->mkdir(FILE_DIR); // make build directory

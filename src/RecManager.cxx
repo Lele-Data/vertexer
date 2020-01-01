@@ -9,8 +9,6 @@
 #include <Riostream.h>
 #include <TFile.h>
 
-// #define DEBUG_1
-
 ClassImp(RecManager);
 
 RecManager *RecManager::fInstance=NULL; // static data member    
@@ -41,9 +39,6 @@ RecManager *RecManager::Destroy(){
 }
 
 void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const{
-  #ifdef DEBUG_1
-    TFile file("histz.root","RECREATE");
-  #endif // DEBUG_1
   for(int iEvent=0;iEvent<tree->GetEntries();++iEvent){ // loop over events
     tree->GetEvent(iEvent);                             // process current event
     
@@ -108,15 +103,6 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     }
     hZtrueMultNsim->Fill(vert.Z,vert.Mult);                                           // increment entries in hZtrueMultNsim histogram
 
-    // SAVE HIST ON DEBUG FILE
-    #ifdef DEBUG_1
-      if(kFALSE){
-      TString hName;
-      hName.Form("hZrec_%d",iEvent);
-      file.cd();
-      hZrec->Write(hName);}
-    #endif // DEBUG_1
-
     // FREE MEMORY
     delete hZrec;
     for(int iHit1=0;iHit1<nHitTotLayer1;++iHit1) {if(arrayHitFirstLayer[iHit1]){delete arrayHitFirstLayer[iHit1];}}
@@ -124,10 +110,6 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
   } // end loop over events
-  #ifdef DEBUG_1
-    file.Write();
-    file.Close();
-  #endif // DEBUG_1
 }
 
 void RecManager::Smearing(Point2D *hit,Layer *layer) const{

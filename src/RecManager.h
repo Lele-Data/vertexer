@@ -14,13 +14,7 @@
 #include <TH1D.h>
 #include "SimulManager.h"
 #include "Vertexer.h"
-
-const double kZresol=0.0120;   // cm
-const double kRphiResol=0.0030;// cm
-const int kMeanNnoise=50.;     // mean number of generated false hits
-const double kZmax=30.0;       // lower limit for the histogram  
-const double kZmin=-30.0;      // upper limit for the histogram
-const int nMaxInter=10000;     // size of array for tracklets intersection with z
+#include "../cfg/Constants.h"
 
 class RecManager : public TObject{
  public:

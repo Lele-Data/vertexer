@@ -9,13 +9,9 @@
 #include <TBranch.h>
 #include <TClonesArray.h>
 #include "../src/SimulManager.h"
+#include "../cfg/Constants.h"
 
-#ifndef FILEDIR
-#define FILEDIR
-const char *FILE_DIR="results/";
-#endif // FILEDIR
-
-void SteerSimul(std::string filename="simul",const char *treename="tree",const int nEvent=10000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=12345){
+void SteerSimul(std::string filename="simul",const char *treename="tree",const int nEvent=10000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=42345){
   const int nHits=kMaxMultiplicity;                  // the maximum number of expoected hits (in Generator.h)
   std::string filename_ext=FILE_DIR+filename+".root"; // filename with *.root extension
   
@@ -36,10 +32,10 @@ void SteerSimul(std::string filename="simul",const char *treename="tree",const i
   tree->Branch("hitsSecondLayer",&ArraySecondLayer); // connect branch to the TClonesArray of Point2D (second layer)
 
   // INSTANTIATE THE BEAM PIPE AND DETECTOR
-  BeamPipe *bpipe=new BeamPipe(3.,0.08); // cm
+  BeamPipe *bpipe=new BeamPipe(kBpipeRadius,kBpipeThick); // cm
   Layer *layers[2];
-  layers[0]=new Layer(4.,0.2,27.); // cm
-  layers[1]=new Layer(7.,0.0,27.); // cm
+  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength); // cm
+  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength); // cm
 
   // GET THE SIMULATION MANAGER INSTANCE AND RUN THE SIMULATION
   SimulManager *manager=SimulManager::GetInstance(nEvent,nMult,nEta,nScat,seed);

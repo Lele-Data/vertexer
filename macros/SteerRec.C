@@ -3,6 +3,7 @@
 //
 // Authors: Mario Ciacco & Emanuele Data
 
+#include <Riostream.h>
 #include <string>
 #include <TFile.h>
 #include <TTree.h>
@@ -10,27 +11,7 @@
 #include <TClonesArray.h>
 #include "../src/SimulManager.h"
 #include "../src/RecManager.h"
-
-#ifndef CONSTANT
-#define CONSTANT
-const double kResMin=-1000.; // um
-const double kResMax=1000.;  // um
-const int kNresBinLim=401;
-const int kNzTrueBins=18;
-const int kNmultBins=12;
-const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
-const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
-#endif // CONSTANT
-
-#ifndef FILEDIR
-#define FILEDIR
-const char *FILE_DIR="results/";
-#endif // FILEDIR
-
-const double kDeltaPhi=0.005;
-const double kZbinWidth=0.04;
-const double kDeltaZ=0.08;
-const double kZwidth=0.1;
+#include "../cfg/Constants.h"
 
 void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double zWidth=kZwidth){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
@@ -43,6 +24,10 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // OPEN FILE AND GET TREE
   TFile inFile(inFilename_ext.c_str());
+  if(!inFile.IsOpen()){
+    std::cout<<"No input file!"<<std::endl;
+    return;
+  }
   TFile outFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
   TTree *tree=(TTree*)inFile.Get("T");
   
@@ -69,8 +54,8 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   
   // INSTANTIATE LAYERS
   Layer *layers[2];
-  layers[0]=new Layer(4.,0.2,27.,kZresol,kRphiResol); // cm
-  layers[1]=new Layer(7.,0.0,27.,kZresol,kRphiResol); // cm
+  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength,kZresol,kRphiResol); // cm
+  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength,kZresol,kRphiResol); // cm
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
   RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth);
@@ -80,4 +65,5 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   // WRITE AND CLOSE FILE
   outFile.Write();
   outFile.Close();
+  inFile.Close();
 }
