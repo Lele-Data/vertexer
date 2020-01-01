@@ -91,14 +91,13 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     } // end of loop over hit layer 1
     
     // FIND AND FIT VERTEX
-    double zTmp=0.;                                                    // variable to find the peak of histogram
-    double zMean=-999.f;                                                    // variable to save mean position of vertex
-    double zRms=-999.f;                                                     // variable to save rms of vertex
+    double zTmp=0.;                                                   // variable to find the peak of histogram
+    double zMean=-999.f;                                              // variable to save mean position of vertex
+    double zRms=-999.f;                                               // variable to save rms of vertex
     bool rec=false;
     if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ)){         // check if vertex is found from histogram
-      BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
+      BubbleSort(zIntersectionTrack,nMaxInter);                                         // sort array of intersections with the z axis
       vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
-      double res=(zMean-vert.Z)*10000.;                                                // compute the residue with respect to the true value (um)
       rec=true;
     }
 
