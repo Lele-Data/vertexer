@@ -5,9 +5,9 @@
 
 #include <TRandom3.h>
 #include <TMath.h>
-#include "RecManager.h"
 #include <Riostream.h>
-#include <TFile.h>
+#include "RecManager.h"
+#include "Vertex.h"
 
 ClassImp(RecManager);
 
@@ -38,9 +38,9 @@ RecManager *RecManager::Destroy(){
   return fInstance;
 }
 
-void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const{
-  for(int iEvent=0;iEvent<tree->GetEntries();++iEvent){ // loop over events
-    tree->GetEvent(iEvent);                             // process current event
+void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex& vtx,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2]) const{
+  for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){ // loop over events
+    inTree->GetEvent(iEvent);                             // process current event
     
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
@@ -92,16 +92,19 @@ void RecManager::RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirst
     
     // FIND AND FIT VERTEX
     double zTmp=0.;                                                    // variable to find the peak of histogram
-    double mean=0.;                                                    // variable to save mean position of vertex
-    double rms=0.;                                                     // variable to save rms of vertex
+    double zMean=-999.f;                                                    // variable to save mean position of vertex
+    double zRms=-999.f;                                                     // variable to save rms of vertex
+    bool rec=false;
     if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ)){         // check if vertex is found from histogram
       BubbleSort(zIntersectionTrack,nMaxInter);                                       // sort array of intersections with the z axis
-      vertxr->FitVertex(zIntersectionTrack,mean,rms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
-      double res=(mean-vert.Z)*10000.;                                                // compute the residue with respect to the true value (um)
-      hZtrueMultRes->Fill(vert.Z,vert.Mult,res);                                      // increment entries in histograms hZtrueMultRes
-      hZtrueMultNrec->Fill(vert.Z,vert.Mult);                                         // increment entries in histograms hZtrueMultNrec
+      vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
+      double res=(zMean-vert.Z)*10000.;                                                // compute the residue with respect to the true value (um)
+      rec=true;
     }
-    hZtrueMultNsim->Fill(vert.Z,vert.Mult);                                           // increment entries in hZtrueMultNsim histogram
+
+    // FILL OUTPUT TREE
+    vtx=Vertex(zMean,zRms,vert.Z,vert.Mult,rec);
+    vtxTree->Fill();
 
     // FREE MEMORY
     delete hZrec;

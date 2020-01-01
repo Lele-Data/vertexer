@@ -22,19 +22,26 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   TClonesArray *hitsFirstLayer=new TClonesArray("Point2D",100);
   TClonesArray *hitsSecondLayer=new TClonesArray("Point2D",100);
 
-  // OPEN FILE AND GET TREE
+  // OPEN FILES (IN/OUT)
   TFile inFile(inFilename_ext.c_str());
+  TFile outFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
   if(!inFile.IsOpen()){
     std::cout<<"No input file!"<<std::endl;
     return;
   }
-  TFile outFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
-  TTree *tree=(TTree*)inFile.Get("T");
+  
+  // INSTANTIATE NEW TREE TO SAVE VERTICES
+  TTree *vtxTree=new TTree(RecTreeName,"vertices");
+  Vertex vtx=NULL;                                    // memory location mapped to tree
+  vtxTree->Branch(RecVertBaranchName,&vtx);           // connect branch to the first memory location; specify types
+
+  // GET TREE FROM INPUT FILE
+  TTree *inTree=(TTree*)inFile.Get(SimulTreeName);
   
   // GET TREE BRANCHES FROM EXISTING TREE
-  TBranch *bVertMult=tree->GetBranch("vert");
-  TBranch *bFirstLayer=tree->GetBranch("hitsFirstLayer");
-  TBranch *bSecondLayer=tree->GetBranch("hitsSecondLayer");
+  TBranch *bVertMult=inTree->GetBranch(SimVertBranchName);
+  TBranch *bFirstLayer=inTree->GetBranch(SimHitFirstBranchName);
+  TBranch *bSecondLayer=inTree->GetBranch(SimHitSecondBranchName);
 
   // SET ADDRESSES OF BRANCHES
   bVertMult->SetAddress(&vert.X);
@@ -44,14 +51,6 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   bSecondLayer->SetAddress(&hitsSecondLayer);
   bSecondLayer->SetAutoDelete(kTRUE);
 
-  // INSTANTIATE HISTOGRAMS
-  double ResBins[kNresBinLim];                        // define residues binning
-  double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
-  for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
-  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBinLim-1,ResBins);
-  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  
   // INSTANTIATE LAYERS
   Layer *layers[2];
   layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength,kZresol,kRphiResol); // cm
@@ -59,7 +58,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
   RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth);
-  manager->RunReconstruction(tree,vert,hitsFirstLayer,hitsSecondLayer,layers,hZtrueMultRes,hZtrueMultNrec,hZtrueMultNsim);
+  manager->RunReconstruction(inTree,vtxTree,vert,vtx,hitsFirstLayer,hitsSecondLayer,layers);
   manager=RecManager::Destroy();
   
   // WRITE AND CLOSE FILE

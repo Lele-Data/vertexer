@@ -45,6 +45,7 @@ void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,dou
   int iMin=0;
   double nZint=0;
   // compute mean
+  mean=0., rms=0.;
   while(arrayZ[iArr]<zMin)++iArr; // find the smallest z used to compute the mean
   iMin=iArr;
   while(!(arrayZ[iArr]>zMax)){

@@ -4,10 +4,12 @@
 #include <TH2D.h>
 #include <TH3D.h>
 #include <TFile.h>
+#include <TTree.h>
 #include <TMath.h>
 #include <TLatex.h>
 #include <TCanvas.h>
 #include <TF1.h>
+#include "../src/Vertex.h"
 #include "../cfg/Constants.h"
 
 const double kDeltaZtrue=4;
@@ -21,21 +23,44 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   gStyle->SetMarkerColor(kRed);
   gStyle->SetMarkerSize(0.8);
   gStyle->SetDrawOption("PE");
-  
-  // OPEN FILE AND GET HISTOGRAMS
+
+  // INSTANTIATE HISTOGRAMS
+  double ResBins[kNresBinLim];                        // define residues binning
+  double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
+  for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
+
+  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBinLim-1,ResBins);
+  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
+  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
+  hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
+  hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
+  hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
+
+  // MEMORY LOCATION MAPPED FROM (INPUT) TREE
+  Vertex *vtx=new Vertex();
+
+  // OPEN FILE AND GET TREE
   TFile inFile(inFilename_ext.c_str());
+  TFile *outFile=new TFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
   if(!inFile.IsOpen()){
     std::cout<<"No input file!"<<std::endl;
     return;
   }
-  TFile *outFile=new TFile(outFilename_ext.c_str(),"RECREATE");  // open a file (write mode)
-  TH3D *hZtrueMultRes=(TH3D*)inFile.Get("hZtrueMultRes");
-  hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
-  hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
-  hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
-  TH2D *hZtrueMultNrec=(TH2D*)inFile.Get("hZtrueMultNrec");
-  TH2D *hZtrueMultNsim=(TH2D*)inFile.Get("hZtrueMultNsim");
-  
+  TTree *inTree=(TTree*)inFile.Get(RecTreeName);
+  TBranch *bVert=inTree->GetBranch(RecVertBaranchName);
+  bVert->SetAddress(&vtx);
+
+  // PROCESS EVENTS (VERTICES) IN TREE AND FILL HISTOGRAMS
+  for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){
+    inTree->GetEvent(iEvent);
+    if(vtx->IsReconstruct()){
+      double res=(vtx->GetZrec()-vtx->GetZtrue())*10000.; // um
+      hZtrueMultRes->Fill(vtx->GetZtrue(),vtx->GetMult(),res);
+      hZtrueMultNrec->Fill(vtx->GetZtrue(),vtx->GetMult());
+    }
+    hZtrueMultNsim->Fill(vtx->GetZtrue(),vtx->GetMult());
+  }
+
   // CREATE HISTOGRAMS FOR EFFICIENCY
   TH1D *hZtrueNrec=hZtrueMultNrec->ProjectionX("hZtrueNrec",1,kNmultBins);
   TH1D *hMultNrec=hZtrueMultNrec->ProjectionY("hMultNrec",1,kNzTrueBins);
@@ -44,7 +69,9 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   TH1D *hZtrueEff=new TH1D("hZtrueEff","Efficiency vs. Z_{true}",kNzTrueBins,kZtrueBins);
   TH1D *hMultEff=new TH1D("hMultEff","Efficiency vs. Multiplicity",kNmultBins,kMultBins);
   hZtrueEff->GetXaxis()->SetTitle("Z_{true}");
+  hZtrueEff->GetYaxis()->SetTitle("Efficiency");
   hMultEff->GetXaxis()->SetTitle("Multiplicity");
+  hMultEff->GetYaxis()->SetTitle("Efficiency");
   
   // COMPUTE EFFICIENCY vs Ztrue
   for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
@@ -73,9 +100,6 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   // GET RESIDUES HISTOGRAM
   char histNameRes[50];
   char histTitleRes[50];
-  double ResBins[kNresBinLim]; // define residues binning
-  double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
-  for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
   
   sprintf(histNameRes,"hZtrueMultRes_projRes_%d",kNmultBins);
   sprintf(histTitleRes,"Residues, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(1),hZtrueMultRes->GetYaxis()->GetBinUpEdge(kNmultBins));
@@ -103,6 +127,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     hMultResol->SetBinError(iMult,fitFun->GetParError(2));
   }
   hMultResol->Write();
+
   for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
     sprintf(histNameRes,"hZtrueMultRes_projResZtrue_%d",iZtrue);
     TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
@@ -116,8 +141,8 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     hZtrueResol->SetBinError(iZtrue,fitFun->GetParError(2));
   }
   hZtrueResol->Write();
+
   // WRITE AND CLOSE FILE
   outFile->Close();
   inFile.Close();
 }
-

@@ -10,6 +10,16 @@
 const char *BUILD_DIR="build"; // build directory name
 const char *FILE_DIR="results/"; // result files directory
 
+// TREE NAMES
+const char *SimulTreeName="T";
+const char *RecTreeName="V";
+
+// BRAMCH NAMES
+const char *SimVertBranchName="vert";
+const char *SimHitFirstBranchName="hitsFirstLayer";
+const char *SimHitSecondBranchName="hitsSecondLayer";
+const char *RecVertBaranchName="vtx";
+
 // DETECTOR AND BEAM PIPE
 const double kBpipeRadius=3.0; // cm
 const double kBpipeThick=0.08; // cm
@@ -48,6 +58,6 @@ const int nMaxInter=10000;     // size of array for tracklets intersection with 
 const double kDeltaPhi=0.005;  // phi slice width
 const double kZbinWidth=0.05;  // bin width
 const double kDeltaZ=0.10;     // horizontal cut
-const double kZwidth=0.10;     // centroid width
+const double kZwidth=0.20;     // centroid width
 
 #endif // CONSTANTS

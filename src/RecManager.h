@@ -13,6 +13,7 @@
 #include <TH2D.h>
 #include <TH1D.h>
 #include "SimulManager.h"
+#include "Vertex.h"
 #include "Vertexer.h"
 #include "../cfg/Constants.h"
 
@@ -20,7 +21,7 @@ class RecManager : public TObject{
  public:
   static RecManager *GetInstance(double deltaPhi,double zBinWidth,double deltaZ,double zWidth);                      // singleton class method
   static RecManager *Destroy();                                                                                      // singleton class method
-  void RunReconstruction(TTree *tree,VTX& vert,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2],TH3D *hZtrueMultRes,TH2D *hZtrueMultNrec,TH2D *hZtrueMultNsim) const;
+  void RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex& vtx,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2]) const;
  private:
   RecManager();                                                                                                      // (private) default constructor
   RecManager(const RecManager& gen);                                                                                 // (private) copy constructor
