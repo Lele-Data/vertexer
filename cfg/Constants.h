@@ -49,15 +49,15 @@ const double kZtrueBins[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0
 const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
 
 // RECONSTRUCTION PARAMETERS
-const int kMeanNnoise=30.;     // mean number of generated false hits
+const int kMeanNnoise=20.;     // mean number of generated false hits
 const double kZmax=30.0;       // lower limit for the histogram  
 const double kZmin=-30.0;      // upper limit for the histogram
-const int nMaxInter=10000;     // size of array for tracklets intersection with z
+const int nMaxInter=100;       // size of array for tracklets intersection with z
 
 // VERTEXER ALGORITHM PARAMETERS
 const double kDeltaPhi=0.005;  // phi slice width
-const double kZbinWidth=0.05;  // bin width
-const double kDeltaZ=0.10;     // horizontal cut
-const double kZwidth=0.20;     // centroid width
+const double kZbinWidth=0.02;  // bin width
+const double kDeltaZ=0.20;     // horizontal cut
+const double kZwidth=0.10;     // centroid width
 
 #endif // CONSTANTS

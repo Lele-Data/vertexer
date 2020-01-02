@@ -45,11 +45,8 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // SET ADDRESSES OF BRANCHES
   bVertMult->SetAddress(&vert.X);
-  bVertMult->SetAutoDelete(kTRUE);
   bFirstLayer->SetAddress(&hitsFirstLayer);
-  bFirstLayer->SetAutoDelete(kTRUE);
   bSecondLayer->SetAddress(&hitsSecondLayer);
-  bSecondLayer->SetAutoDelete(kTRUE);
 
   // INSTANTIATE LAYERS
   Layer *layers[2];

@@ -24,18 +24,6 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   gStyle->SetMarkerSize(0.8);
   gStyle->SetDrawOption("PE");
 
-  // INSTANTIATE HISTOGRAMS
-  double ResBins[kNresBinLim];                        // define residues binning
-  double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
-  for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
-
-  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBinLim-1,ResBins);
-  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
-  hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
-  hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
-
   // MEMORY LOCATION MAPPED FROM (INPUT) TREE
   Vertex *vtx=new Vertex();
 
@@ -50,6 +38,18 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   TBranch *bVert=inTree->GetBranch(RecVertBaranchName);
   bVert->SetAddress(&vtx);
 
+  // INSTANTIATE HISTOGRAMS
+  double ResBins[kNresBinLim];                        // define residues binning
+  double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
+  for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
+
+  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBinLim-1,ResBins);
+  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
+  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
+  hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
+  hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
+  hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
+
   // PROCESS EVENTS (VERTICES) IN TREE AND FILL HISTOGRAMS
   for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){
     inTree->GetEvent(iEvent);
@@ -61,6 +61,10 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     hZtrueMultNsim->Fill(vtx->GetZtrue(),vtx->GetMult());
   }
 
+  hZtrueMultRes->Write();
+  hZtrueMultNrec->Write();
+  hZtrueMultNsim->Write();
+
   // CREATE HISTOGRAMS FOR EFFICIENCY
   TH1D *hZtrueNrec=hZtrueMultNrec->ProjectionX("hZtrueNrec",1,kNmultBins);
   TH1D *hMultNrec=hZtrueMultNrec->ProjectionY("hMultNrec",1,kNzTrueBins);
@@ -68,7 +72,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   TH1D *hMultNsim=hZtrueMultNsim->ProjectionY("hMultNsim",1,kNzTrueBins);
   TH1D *hZtrueEff=new TH1D("hZtrueEff","Efficiency vs. Z_{true}",kNzTrueBins,kZtrueBins);
   TH1D *hMultEff=new TH1D("hMultEff","Efficiency vs. Multiplicity",kNmultBins,kMultBins);
-  hZtrueEff->GetXaxis()->SetTitle("Z_{true}");
+  hZtrueEff->GetXaxis()->SetTitle("Z_{true} cm");
   hZtrueEff->GetYaxis()->SetTitle("Efficiency");
   hMultEff->GetXaxis()->SetTitle("Multiplicity");
   hMultEff->GetYaxis()->SetTitle("Efficiency");
@@ -110,6 +114,10 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   // DECLARE RESOLUTION HISTOGRAMS
   TH1D *hMultResol=new TH1D("hMultResol","Resolution vs. Multiplicity",kNmultBins,kMultBins);
   TH1D *hZtrueResol=new TH1D("hZtrueResol","Resolution vs. Z_{true}",kNzTrueBins,kZtrueBins);
+  hMultResol->GetXaxis()->SetTitle("Multiplicity");
+  hMultResol->GetYaxis()->SetTitle("Resolution (#mum)");
+  hZtrueResol->GetXaxis()->SetTitle("Z_{true} (cm)");
+  hZtrueResol->GetYaxis()->SetTitle("Resolution (#mum)");
 
   TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
   for(int iMult=1;iMult<=kNmultBins;iMult++){
@@ -121,21 +129,21 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     fitFun->SetParLimits(0,0.,1.e9);
     fitFun->SetParLimits(1,-100.,100.);
     fitFun->SetParLimits(2,0.,600.);
-    projectionOnRes_mult->Fit(fitFun,"q");
+    projectionOnRes_mult->Fit(fitFun,"q","",-800.,800.);
     projectionOnRes_mult->Write();
     hMultResol->SetBinContent(iMult,fitFun->GetParameter(2));
     hMultResol->SetBinError(iMult,fitFun->GetParError(2));
   }
   hMultResol->Write();
 
-  for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
+  for(int iZtrue=1;iZtrue<=kNzTrueBins;iZtrue++){
     sprintf(histNameRes,"hZtrueMultRes_projResZtrue_%d",iZtrue);
     TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
     // GAUSSIAN FIT TO GET RESOLUTION
     fitFun->SetParLimits(0,0.,1.e9);
     fitFun->SetParLimits(1,-100.,100.);
     fitFun->SetParLimits(2,0.,600.);
-    projectionOnRes_ztrue->Fit(fitFun,"q");
+    projectionOnRes_ztrue->Fit(fitFun,"q","",-800.,800.);
     projectionOnRes_ztrue->Write();
     hZtrueResol->SetBinContent(iZtrue,fitFun->GetParameter(2));
     hZtrueResol->SetBinError(iZtrue,fitFun->GetParError(2));

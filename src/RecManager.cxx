@@ -8,6 +8,7 @@
 #include <Riostream.h>
 #include "RecManager.h"
 #include "Vertex.h"
+#include <TFile.h>
 
 ClassImp(RecManager);
 
@@ -39,9 +40,11 @@ RecManager *RecManager::Destroy(){
 }
 
 void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex& vtx,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2]) const{
+  // TFile file("histz.root","RECREATE");
   for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){ // loop over events
     inTree->GetEvent(iEvent);                             // process current event
-    
+    std::cout<<"event: "<<iEvent<<std::endl;
+
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
@@ -74,7 +77,8 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     int nBin=(kZmax-kZmin)/fZBinWidth;
     TH1D *hZrec=new TH1D("hZrec","hZrec",nBin,kZmin,kZmax);           // instantiate tracklets z intersection histogram
     hZrec->SetDirectory(0);                                           // avoid segmentation fault giving owner
-    double zIntersectionTrack[nMaxInter]={0};                         // instantiate array for intersection
+    double zIntersectionTrack[nMaxInter];                             // instantiate array for intersection
+    for(int iArr : zIntersectionTrack)iArr=+999.f;                    // initialize array entries
     int zInterCounter=0;                                              // counter of tracklets intersection
 
     // LOOP TO FIND TRACKLETS INTERSECTIONS WITH Z AXIS
@@ -97,14 +101,16 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     bool rec=false;
     if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ)){         // check if vertex is found from histogram
       BubbleSort(zIntersectionTrack,nMaxInter);                                         // sort array of intersections with the z axis
-      vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zTmp-fZWidth/2.,zTmp+fZWidth/2.); // fit vertex (within centroid region) if found
+      double zMin=zTmp-fZWidth/2., zMax=zTmp+fZWidth/2.;
+      vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zMin,zMax);     // fit vertex (within centroid region) if found
+      // std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<std::endl;
       rec=true;
     }
 
     // FILL OUTPUT TREE
     vtx=Vertex(zMean,zRms,vert.Z,vert.Mult,rec);
     vtxTree->Fill();
-
+    // if(iEvent%10000==0){file.cd();hZrec->Write();}
     // FREE MEMORY
     delete hZrec;
     for(int iHit1=0;iHit1<nHitTotLayer1;++iHit1) {if(arrayHitFirstLayer[iHit1]){delete arrayHitFirstLayer[iHit1];}}
@@ -112,6 +118,7 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
   } // end loop over events
+  // file.Close();
 }
 
 void RecManager::Smearing(Point2D *hit,Layer *layer) const{

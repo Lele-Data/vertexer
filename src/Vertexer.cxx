@@ -43,25 +43,29 @@ bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
 void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const{
   int iArr=0;
   int iMin=0;
-  double nZint=0;
+  double nZint=1.;
   // compute mean
-  mean=0., rms=0.;
   while(arrayZ[iArr]<zMin)++iArr; // find the smallest z used to compute the mean
-  iMin=iArr;
-  while(!(arrayZ[iArr]>zMax)){
+  iMin=iArr++;
+  mean=arrayZ[iMin];
+  // std::cout<<mean<<std::endl;
+  while(arrayZ[iArr]<zMax){
     ++nZint;
-    mean+=arrayZ[iArr++];
+    // std::cout<<arrayZ[iArr]<<std::endl;
+    mean+=arrayZ[iArr];
+    ++iArr;
   }
   mean/=nZint;
   // compute rms
-  iArr=iMin;
-  nZint=0.;
+  iArr=iMin+1;
+  nZint=1.;
+  rms=(arrayZ[iMin]-mean)*(arrayZ[iMin]-mean);
   while(!(arrayZ[iArr]>zMax)){
     ++nZint;
     rms+=(arrayZ[iArr]-mean)*(arrayZ[iArr]-mean);
     ++iArr;
   }
-  rms/=(nZint-1);
+  if(nZint>1.5)rms/=(nZint-1.);
   rms=TMath::Sqrt(rms);
 }
 
