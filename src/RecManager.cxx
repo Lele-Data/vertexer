@@ -40,7 +40,7 @@ RecManager *RecManager::Destroy(){
 }
 
 void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex& vtx,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2]) const{
-  // TFile file("histz.root","RECREATE");
+  TFile file("histz.root","RECREATE");
   for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){ // loop over events
     inTree->GetEvent(iEvent);                             // process current event
     std::cout<<"event: "<<iEvent<<std::endl;
@@ -103,14 +103,14 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
       BubbleSort(zIntersectionTrack,nMaxInter);                                         // sort array of intersections with the z axis
       double zMin=zTmp-fZWidth/2., zMax=zTmp+fZWidth/2.;
       vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zMin,zMax);     // fit vertex (within centroid region) if found
-      // std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<std::endl;
+      std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<"\t"<<vert.Z<<std::endl;
       rec=true;
     }
 
     // FILL OUTPUT TREE
     vtx=Vertex(zMean,zRms,vert.Z,vert.Mult,rec);
     vtxTree->Fill();
-    // if(iEvent%10000==0){file.cd();hZrec->Write();}
+    if(iEvent%10000==0){file.cd();hZrec->Write();}
     // FREE MEMORY
     delete hZrec;
     for(int iHit1=0;iHit1<nHitTotLayer1;++iHit1) {if(arrayHitFirstLayer[iHit1]){delete arrayHitFirstLayer[iHit1];}}
@@ -118,7 +118,7 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
   } // end loop over events
-  // file.Close();
+  file.Close();
 }
 
 void RecManager::Smearing(Point2D *hit,Layer *layer) const{

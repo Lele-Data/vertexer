@@ -32,8 +32,8 @@ Vertexer *Vertexer::Destroy(){
 
 bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
   int bFirstMax=FindFirstMaximum(hZrec);
-  zTmp=hZrec->GetBinCenter(bFirstMax);
   int bSecondMax=FindSecondMaximum(hZrec);
+  zTmp=(hZrec->GetBinCenter(bFirstMax)+hZrec->GetBinCenter(bFirstMax))/2.;
   double deltaZobs=fabs((double)(bFirstMax-bSecondMax))*hZrec->GetBinWidth(1); // compute the distance between the two highest bins
   if(deltaZobs<deltaZ) // horizontal (z) cut
     return true;

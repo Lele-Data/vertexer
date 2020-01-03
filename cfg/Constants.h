@@ -56,8 +56,8 @@ const int nMaxInter=100;       // size of array for tracklets intersection with 
 
 // VERTEXER ALGORITHM PARAMETERS
 const double kDeltaPhi=0.005;  // phi slice width
-const double kZbinWidth=0.02;  // bin width
+const double kZbinWidth=0.06;  // bin width
 const double kDeltaZ=0.10;     // horizontal cut
-const double kZwidth=0.20;     // centroid width
+const double kZwidth=0.26;     // centroid width
 
 #endif // CONSTANTS

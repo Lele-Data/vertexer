@@ -143,7 +143,8 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     fitFun->SetParLimits(0,0.,1.e9);
     fitFun->SetParLimits(1,-100.,100.);
     fitFun->SetParLimits(2,0.,600.);
-    projectionOnRes_ztrue->Fit(fitFun,"q","",-800.,800.);
+    if(iZtrue<6||iZtrue>13)projectionOnRes_ztrue->Rebin(3);
+    projectionOnRes_ztrue->Fit(fitFun,"q","",-200.,200.);
     projectionOnRes_ztrue->Write();
     hZtrueResol->SetBinContent(iZtrue,fitFun->GetParameter(2));
     hZtrueResol->SetBinError(iZtrue,fitFun->GetParError(2));
