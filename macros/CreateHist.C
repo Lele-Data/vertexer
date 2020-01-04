@@ -135,7 +135,8 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     fitFun->SetParLimits(0,0.,1.e5);
     fitFun->SetParLimits(1,-50.,50.);
     fitFun->SetParLimits(2,0.,600.);
-    fitFun->SetLineColor(kBlue+3);projectionOnRes_mult->Fit(fitFun,"QLM+","",fitRanges[iMult-1][0],fitRanges[iMult-1][1]);
+    fitFun->SetLineColor(kBlue+3);
+    projectionOnRes_mult->Fit(fitFun,"QLM+","",fitRanges[iMult-1][0],fitRanges[iMult-1][1]);
     projectionOnRes_mult->GetXaxis()->SetRangeUser(-4.*fitFun->GetParameter(2),4.*fitFun->GetParameter(2));
     projectionOnRes_mult->SetMarkerStyle(20);
     projectionOnRes_mult->SetMarkerColor(kRed);
