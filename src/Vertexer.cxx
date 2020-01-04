@@ -31,6 +31,7 @@ Vertexer *Vertexer::Destroy(){
 }
 
 bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
+  if(hZrec->GetEntries()<1.e-7)return false;
   int bFirstMax=FindFirstMaximum(hZrec);
   int bSecondMax=FindSecondMaximum(hZrec);
   zTmp=(hZrec->GetBinCenter(bFirstMax)+hZrec->GetBinCenter(bFirstMax))/2.;

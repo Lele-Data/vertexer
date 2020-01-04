@@ -44,11 +44,11 @@ const double kResMin=-1000.; // um
 const double kResMax=1000.;  // um
 const int kNresBinLim=201;
 const int kNzTrueBinsExtend=18;
-const int kNzTrueBins=10;
+const int kNzTrueBins=8;
 const int kNmultBins=11;
 const int kNmultBinsExtend=12;
 const double kZtrueBinsExtend[]={-30.0,-27.0,-25.0,-23.0,-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0,23.0,25.0,27.0,30.0};
-const double kZtrueBins[]={-20.0,-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0,20.0};
+const double kZtrueBins[]={-15.0,-10.0,-5.0,-2.5,0.0,2.5,5.0,10.0,15.0};
 const double kMultBinsExtend[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0,100.0};
 const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0};
 
