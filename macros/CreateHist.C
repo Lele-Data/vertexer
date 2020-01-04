@@ -43,7 +43,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   bVert->SetAddress(&vtx);
 
   // INSTANTIATE HISTOGRAMS
-  double ResBins[kNresBinLim];                        // define residues binning
+  double ResBins[kNresBinLim];                        // define residual binning
   double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
   for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
 
@@ -76,7 +76,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   TH1D *hMultNsim=hZtrueMultNsim->ProjectionY("hMultNsim",1,kNzTrueBins);
   TH1D *hZtrueEff=new TH1D("hZtrueEff","Efficiency vs. Z_{true}",kNzTrueBins,kZtrueBins);
   TH1D *hMultEff=new TH1D("hMultEff","Efficiency vs. Multiplicity",kNmultBins,kMultBins);
-  hZtrueEff->GetXaxis()->SetTitle("Z_{true} cm");
+  hZtrueEff->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueEff->GetYaxis()->SetTitle("Efficiency");
   hMultEff->GetXaxis()->SetTitle("Multiplicity");
   hMultEff->GetYaxis()->SetTitle("Efficiency");
@@ -105,12 +105,12 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   }
   hMultEff->Write();
   
-  // GET RESIDUES HISTOGRAM
+  // GET RESIDUAL HISTOGRAM
   char histNameRes[50];
   char histTitleRes[50];
   
   sprintf(histNameRes,"hZtrueMultRes_projRes_%d",kNmultBins);
-  sprintf(histTitleRes,"Residues, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(1),hZtrueMultRes->GetYaxis()->GetBinUpEdge(kNmultBins));
+  sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(1),hZtrueMultRes->GetYaxis()->GetBinUpEdge(kNmultBins));
   TH1D *projectionOnRes=hZtrueMultRes->ProjectionZ(histNameRes,1,kNmultBins,1,kNzTrueBins);
   projectionOnRes->SetTitle(histTitleRes);
   projectionOnRes->Write();
@@ -130,12 +130,12 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     projectionOnRes_mult->SetTitle(histTitleRes);
     // GAUSSIAN FIT TO GET RESOLUTION
     TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
-    fitFun->SetParLimits(0,0.,1.e4);
-    fitFun->SetParLimits(1,-20.,20.);
-    fitFun->SetParLimits(2,30.,400.);
+    fitFun->SetParLimits(0,0.,1.e5);
+    fitFun->SetParLimits(1,-50.,50.);
+    fitFun->SetParLimits(2,0.,600.);
     fitFun->SetLineColor(kBlue+3);
     double hist_rms=projectionOnRes_mult->GetRMS();
-    projectionOnRes_mult->Fit(fitFun,"q","",-3.0*hist_rms,3.0*hist_rms);
+    projectionOnRes_mult->Fit(fitFun,"QLM+","",-1.5*hist_rms,1.5*hist_rms);
     projectionOnRes_mult->GetXaxis()->SetRangeUser(-4.*fitFun->GetParameter(2),4.*fitFun->GetParameter(2));
     projectionOnRes_mult->SetMarkerStyle(20);
     projectionOnRes_mult->SetMarkerColor(kRed);
@@ -152,16 +152,11 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
     // GAUSSIAN FIT TO GET RESOLUTION
     TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
-    fitFun->SetParLimits(0,0.,1.e4);
+    fitFun->SetParLimits(0,0.,1.e5);
     fitFun->SetParLimits(1,-50.,50.);
     fitFun->SetParLimits(2,0.,600.);
     fitFun->SetLineColor(kBlue+3);
-    if(iZtrue<2||iZtrue>9){ // estremal z_true classes (small sample)
-      projectionOnRes_ztrue->Rebin(2);
-      projectionOnRes_ztrue->Fit(fitFun,"q","",-800.,800.);
-    }
-    else // central z_true classes (wider sample)
-      projectionOnRes_ztrue->Fit(fitFun,"q","",-150.,150.);
+    projectionOnRes_ztrue->Fit(fitFun,"QLM+","",-190.,190.);
     projectionOnRes_ztrue->Write();
     projectionOnRes_ztrue->SetMarkerStyle(20);
     projectionOnRes_ztrue->SetMarkerColor(kRed);

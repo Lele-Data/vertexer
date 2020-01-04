@@ -8,13 +8,15 @@
 #include <TTree.h>
 #include <TBranch.h>
 #include <TClonesArray.h>
+#include <TStopwatch.h>
 #include "../src/SimulManager.h"
 #include "../cfg/Constants.h"
 
 void SteerSimul(std::string filename="simul",const char *treename="tree",const int nEvent=100000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=42345){
   const int nHits=kMaxMultiplicity;                       // the maximum number of expoected hits (in Generator.h)
   std::string filename_ext=FILE_DIR+filename+".root";     // filename with *.root extension
-  
+  TStopwatch swatch;
+
   // CREATE FILE AND TREE
   TFile file(filename_ext.c_str(),"RECREATE");            // open a file (write mode)
   TTree *tree=new TTree(SimulTreeName,treename);          // create a tree
@@ -39,7 +41,10 @@ void SteerSimul(std::string filename="simul",const char *treename="tree",const i
 
   // GET THE SIMULATION MANAGER INSTANCE AND RUN THE SIMULATION
   SimulManager *manager=SimulManager::GetInstance(nEvent,nMult,nEta,nScat,seed);
+  swatch.Start();
   manager->RunSimulation(tree,vert,HitsFirstLayer,HitsSecondLayer,bpipe,layers);
+  swatch.Stop();
+  swatch.Print("m");
   manager=SimulManager::Destroy();
 
   // WRITE AND CLOSE FILE

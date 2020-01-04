@@ -9,6 +9,7 @@
 #include <TTree.h>
 #include <TBranch.h>
 #include <TClonesArray.h>
+#include <TStopwatch.h>
 #include "../src/SimulManager.h"
 #include "../src/RecManager.h"
 #include "../cfg/Constants.h"
@@ -17,6 +18,8 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
   std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
   
+  TStopwatch swatch;
+
   // DECLARE MEMORY LOCATION
   static VTX vert={0,0,0,0};
   TClonesArray *hitsFirstLayer=new TClonesArray("Point2D",100);
@@ -32,8 +35,8 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   
   // INSTANTIATE NEW TREE TO SAVE VERTICES
   TTree *vtxTree=new TTree(RecTreeName,"vertices");
-  Vertex vtx(-999.f,-999.f,-999.f,-999.f,false);      // memory location mapped to tree
-  vtxTree->Branch(RecVertBaranchName,&vtx);           // connect branch to the first memory location; specify types
+  static Vertex vtx(-999.f,-999.f,-999.f,-999.f,false);// memory location mapped to tree
+  vtxTree->Branch(RecVertBaranchName,&vtx);            // connect branch to the first memory location; specify types
 
   // GET TREE FROM INPUT FILE
   TTree *inTree=(TTree*)inFile.Get(SimulTreeName);
@@ -55,7 +58,10 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
   RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth);
+  swatch.Start(); // start stopwatch
   manager->RunReconstruction(inTree,vtxTree,vert,vtx,hitsFirstLayer,hitsSecondLayer,layers);
+  swatch.Stop();
+  swatch.Print("m");
   manager=RecManager::Destroy();
   
   // WRITE AND CLOSE FILE
