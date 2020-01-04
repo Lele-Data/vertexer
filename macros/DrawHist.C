@@ -17,7 +17,7 @@ void DrawHist(std::string inFilename="HistResult_Eff_Reso"){
   gStyle->SetOptFit(1111);
 
   TFile *resultFile=new TFile(inFilename_ext.c_str());
-  TH1D *projectionOnRes=(TH1D*)resultFile->Get("hZtrueMultRes_projRes_11");
+  TH1D *projectionOnRes=(TH1D*)resultFile->Get("hZtrueMultRes_projRes_Tot");
   TH1D *hMultEff=(TH1D*)resultFile->Get("hMultEff");
   TH1D *hZtrueEff=(TH1D*)resultFile->Get("hZtrueEff");
   TH1D *hMultResol=(TH1D*)resultFile->Get("hMultResol");

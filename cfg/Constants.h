@@ -42,7 +42,7 @@ const double kSigZ=5.30; // cm
 // HISTOGRAM BINNING
 const double kResMin=-1000.; // um
 const double kResMax=1000.;  // um
-const int kNresBinLim=201;
+const int kNresBinLim=301;
 const int kNzTrueBinsExtend=18;
 const int kNzTrueBins=8;
 const int kNmultBins=11;

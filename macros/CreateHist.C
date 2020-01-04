@@ -22,7 +22,7 @@ double fitRanges[][2]={{-700.,700.},{-600.,600.},{-600.,600.},{-500.,500.},{-500
 void Efficiency(TH1D *hRec,TH1D *hSim,int iBin,double& eff,double& eff_err);
 void SetHistStdOptions(TH1 *hist);
 
-void CreateHist(std::string inFilename="recResult",std::string outFilename="HistResult_Eff_Reso"){
+void CreateHist(std::string inFilename="recResult",std::string outFilename="HistResult_Eff_Reso",int deltaNmultBin=0){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
   std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
 
@@ -48,9 +48,9 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   double ResStep=(kResMax-kResMin)/(kNresBinLim-1.);
   for(int iBin=0;iBin<kNresBinLim;++iBin)ResBins[iBin]=kResMin+ResStep*iBin;
 
-  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins,kNresBinLim-1,ResBins);
-  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
-  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins,kMultBins);
+  TH3D *hZtrueMultRes=new TH3D("hZtrueMultRes","hZtrueMultRes",kNzTrueBins,kZtrueBins,kNmultBins-deltaNmultBin,kMultBins,kNresBinLim-1,ResBins);
+  TH2D *hZtrueMultNrec=new TH2D("hZtrueMultNrec","hZtrueMultNrec",kNzTrueBins,kZtrueBins,kNmultBins-deltaNmultBin,kMultBins);
+  TH2D *hZtrueMultNsim=new TH2D("hZtrueMultNsim","hZtrueMultNsim",kNzTrueBins,kZtrueBins,kNmultBins-deltaNmultBin,kMultBins);
   hZtrueMultRes->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueMultRes->GetYaxis()->SetTitle("Multiplicity");
   hZtrueMultRes->GetZaxis()->SetTitle("Z_{rec}-Z_{true} (#mum)");
@@ -71,12 +71,12 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   hZtrueMultNsim->Write();
 
   // CREATE HISTOGRAMS FOR EFFICIENCY
-  TH1D *hZtrueNrec=hZtrueMultNrec->ProjectionX("hZtrueNrec",1,kNmultBins);
+  TH1D *hZtrueNrec=hZtrueMultNrec->ProjectionX("hZtrueNrec",1,kNmultBins-deltaNmultBin);
   TH1D *hMultNrec=hZtrueMultNrec->ProjectionY("hMultNrec",1,kNzTrueBins);
-  TH1D *hZtrueNsim=hZtrueMultNsim->ProjectionX("hZtrueNsim",1,kNmultBins);
+  TH1D *hZtrueNsim=hZtrueMultNsim->ProjectionX("hZtrueNsim",1,kNmultBins-deltaNmultBin);
   TH1D *hMultNsim=hZtrueMultNsim->ProjectionY("hMultNsim",1,kNzTrueBins);
   TH1D *hZtrueEff=new TH1D("hZtrueEff","Efficiency vs. Z_{true}",kNzTrueBins,kZtrueBins);
-  TH1D *hMultEff=new TH1D("hMultEff","Efficiency vs. Multiplicity",kNmultBins,kMultBins);
+  TH1D *hMultEff=new TH1D("hMultEff","Efficiency vs. Multiplicity",kNmultBins-deltaNmultBin,kMultBins);
   hZtrueEff->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueEff->GetYaxis()->SetTitle("Efficiency");
   hMultEff->GetXaxis()->SetTitle("Multiplicity");
@@ -95,7 +95,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   hZtrueEff->Write();
   
   // COMPUTE EFFICIENCY vs MULTIPLICITY
-  for(int iMult=1;iMult<=kNmultBins;iMult++){
+  for(int iMult=1;iMult<=kNmultBins-deltaNmultBin;iMult++){
     if(hMultNsim->GetBinContent(iMult)<1.e-9) continue;
     Efficiency(hMultNrec,hMultNsim,iMult,eff,eff_err);
     hMultEff->SetBinContent(iMult,eff);
@@ -108,22 +108,22 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   char histNameRes[50];
   char histTitleRes[50];
   
-  sprintf(histNameRes,"hZtrueMultRes_projRes_%d",kNmultBins);
-  sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(1),hZtrueMultRes->GetYaxis()->GetBinUpEdge(kNmultBins));
-  TH1D *projectionOnRes=hZtrueMultRes->ProjectionZ(histNameRes,1,kNmultBins,1,kNzTrueBins);
+  sprintf(histNameRes,"hZtrueMultRes_projRes_%d",kNmultBins-deltaNmultBin);
+  sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(1),hZtrueMultRes->GetYaxis()->GetBinUpEdge(kNmultBins-deltaNmultBin));
+  TH1D *projectionOnRes=hZtrueMultRes->ProjectionZ("hZtrueMultRes_projRes_Tot",1,kNmultBins-deltaNmultBin,1,kNzTrueBins);
   projectionOnRes->SetTitle(histTitleRes);
   SetHistStdOptions(projectionOnRes);
   projectionOnRes->Write();
 
   // DECLARE RESOLUTION HISTOGRAMS
-  TH1D *hMultResol=new TH1D("hMultResol","Resolution vs. Multiplicity",kNmultBins,kMultBins);
+  TH1D *hMultResol=new TH1D("hMultResol","Resolution vs. Multiplicity",kNmultBins-deltaNmultBin,kMultBins);
   TH1D *hZtrueResol=new TH1D("hZtrueResol","Resolution vs. Z_{true}",kNzTrueBins,kZtrueBins);
   hMultResol->GetXaxis()->SetTitle("Multiplicity");
   hMultResol->GetYaxis()->SetTitle("Resolution (#mum)");
   hZtrueResol->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueResol->GetYaxis()->SetTitle("Resolution (#mum)");
 
-  for(int iMult=1;iMult<=kNmultBins;iMult++){
+  for(int iMult=1;iMult<=kNmultBins-deltaNmultBin;iMult++){
     sprintf(histNameRes,"hZtrueMultRes_projResMult_%d",iMult);
     sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(iMult),hZtrueMultRes->GetYaxis()->GetBinUpEdge(iMult));
     TH1D *projectionOnRes_mult=hZtrueMultRes->ProjectionZ(histNameRes,1,kNzTrueBins,iMult,iMult);
@@ -143,7 +143,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
 
   for(int iZtrue=1;iZtrue<=kNzTrueBins;iZtrue++){
     sprintf(histNameRes,"hZtrueMultRes_projResZtrue_%d",iZtrue);
-    TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
+    TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins-deltaNmultBin);
     // GAUSSIAN FIT TO GET RESOLUTION
     TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
     fitFun->SetLineColor(kBlue+3);
