@@ -4,8 +4,8 @@
 // Authors: Mario Ciacco & Emanuele Data
 
 #include <TMath.h>
-#include "Vertexer.h"
 #include <Riostream.h>
+#include "Vertexer.h"
 
 ClassImp(Vertexer);
 

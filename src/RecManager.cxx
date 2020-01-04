@@ -5,10 +5,13 @@
 
 #include <TRandom3.h>
 #include <TMath.h>
+#include <TFile.h>
 #include <Riostream.h>
 #include "RecManager.h"
 #include "Vertex.h"
-#include <TFile.h>
+
+// #define DEBUG_HIST
+// #define DEBUG_PRINT
 
 ClassImp(RecManager);
 
@@ -40,16 +43,18 @@ RecManager *RecManager::Destroy(){
 }
 
 void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex& vtx,TClonesArray *hitsFirstLayer,TClonesArray *hitsSecondLayer,Layer *layer[2]) const{
-  TFile file("histz.root","RECREATE");
+  #ifdef DEBUG_HIST
+    TFile file("histz.root","RECREATE");
+  #endif // DEBUG_HIST
   for(int iEvent=0;iEvent<inTree->GetEntries();++iEvent){ // loop over events
     inTree->GetEvent(iEvent);                             // process current event
-    std::cout<<"event: "<<iEvent<<std::endl;
+    if(iEvent%10000==0){std::cout<<"event: "<<iEvent<<std::endl;}
 
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
-    int nHitNoiseLayer1=GenerateNhitNoise(kMeanNnoise);               // generate the number of false hits
-    int nHitNoiseLayer2=GenerateNhitNoise(kMeanNnoise);
+    int nHitNoiseLayer1=GenerateNhitNoise(kMeanNnoise1);              // generate the number of false hits
+    int nHitNoiseLayer2=GenerateNhitNoise(kMeanNnoise2);
     int nHitTotLayer1=nHitLayer1+nHitNoiseLayer1;                     // total number of hits
     int nHitTotLayer2=nHitLayer2+nHitNoiseLayer2;
     Point2D **arrayHitFirstLayer=new Point2D*[nHitTotLayer1];         // allocate memory for hit array
@@ -103,14 +108,18 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
       BubbleSort(zIntersectionTrack,nMaxInter);                                         // sort array of intersections with the z axis
       double zMin=zTmp-fZWidth/2., zMax=zTmp+fZWidth/2.;
       vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zMin,zMax);     // fit vertex (within centroid region) if found
-      std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<"\t"<<vert.Z<<std::endl;
+      #ifdef DEBUG_PRINT
+        std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<"\t"<<vert.Z<<std::endl;
+      #endif // DEBUG_PRINT
       rec=true;
     }
 
     // FILL OUTPUT TREE
     vtx=Vertex(zMean,zRms,vert.Z,vert.Mult,rec);
     vtxTree->Fill();
-    if(iEvent%10000==0){file.cd();hZrec->Write();}
+    #ifdef DEBUG_HIST
+      if(iEvent%10000==0){file.cd();hZrec->Write();}
+    #endif // DEBUG_HIST
     // FREE MEMORY
     delete hZrec;
     for(int iHit1=0;iHit1<nHitTotLayer1;++iHit1) {if(arrayHitFirstLayer[iHit1]){delete arrayHitFirstLayer[iHit1];}}
@@ -118,7 +127,9 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     delete[] arrayHitFirstLayer;
     delete[] arrayHitSecondLayer;
   } // end loop over events
-  file.Close();
+  #ifdef DEBUG_HIST
+    file.Close();
+  #endif // DEBUG_HIST
 }
 
 void RecManager::Smearing(Point2D *hit,Layer *layer) const{

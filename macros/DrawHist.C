@@ -1,4 +1,10 @@
+// DrawHist.C
+// This macro draws on canvas the histograms created by CreateHist.C
+//
+// Authors: Mario Ciacco & Emanuele Data
+
 #include <TFile.h>
+#include <TStyle.h>
 #include <TCanvas.h>
 #include <TH1D.h>
 #include "../cfg/Constants.h"
@@ -6,9 +12,11 @@
 void DrawHist(std::string inFilename="HistResult_Eff_Reso"){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
 
+  gStyle->SetOptFit(1111);
+
   TFile *resultFile=new TFile(inFilename_ext.c_str());
-  TH1D *projectionOnRes=(TH1D*)resultFile->Get("hZtrueMultRes_projRes_12");
-  TH1D *projectionOnRes_Mult7=(TH1D*)resultFile->Get("hZtrueMultRes_projResMult_7");
+  TH1D *projectionOnRes=(TH1D*)resultFile->Get("hZtrueMultRes_projRes_11");
+  TH1D *projectionOnRes_Mult=(TH1D*)resultFile->Get("hZtrueMultRes_projResMult_8");
   TH1D *hMultEff=(TH1D*)resultFile->Get("hMultEff");
   TH1D *hZtrueEff=(TH1D*)resultFile->Get("hZtrueEff");
   TH1D *hMultResol=(TH1D*)resultFile->Get("hMultResol");
@@ -16,10 +24,10 @@ void DrawHist(std::string inFilename="HistResult_Eff_Reso"){
 
   TCanvas *c1=new TCanvas("c1");
   c1->cd();
-  projectionOnRes->Draw();
+  projectionOnRes->Draw("PE");
   TCanvas *c1a=new TCanvas("c1a");
   c1a->cd();
-  projectionOnRes_Mult7->Draw();
+  projectionOnRes_Mult->Draw("PE");
   TCanvas *c2=new TCanvas("c2");
   c2->cd();
   hMultEff->Draw();

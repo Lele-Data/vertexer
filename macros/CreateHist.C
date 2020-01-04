@@ -1,3 +1,8 @@
+// CreateHist.h
+// This macro reads the tree of vertices and creates histograms
+//
+// Authors: Mario Ciacco & Emanuele Data
+
 #include <Riostream.h>
 #include <TStyle.h>
 #include <TH1D.h>
@@ -12,8 +17,6 @@
 #include "../src/Vertex.h"
 #include "../cfg/Constants.h"
 
-const double kDeltaZtrue=4;
-
 void CreateHist(std::string inFilename="recResult",std::string outFilename="HistResult_Eff_Reso"){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
   std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
@@ -23,6 +26,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   gStyle->SetMarkerColor(kRed);
   gStyle->SetMarkerSize(0.8);
   gStyle->SetDrawOption("PE");
+  gStyle->SetOptFit(1111);
 
   // MEMORY LOCATION MAPPED FROM (INPUT) TREE
   Vertex *vtx=new Vertex();
@@ -78,7 +82,7 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   hMultEff->GetYaxis()->SetTitle("Efficiency");
   
   // COMPUTE EFFICIENCY vs Ztrue
-  for(int iZtrue=1+kDeltaZtrue;iZtrue<=kNzTrueBins-kDeltaZtrue;iZtrue++){
+  for(int iZtrue=1;iZtrue<=kNzTrueBins;iZtrue++){
     if(hZtrueNsim->GetBinContent(iZtrue)<1.e-9) continue;
     double n_tot=hZtrueNsim->GetBinContent(iZtrue);
     double n_rec=hZtrueNrec->GetBinContent(iZtrue);
@@ -119,17 +123,24 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
   hZtrueResol->GetXaxis()->SetTitle("Z_{true} (cm)");
   hZtrueResol->GetYaxis()->SetTitle("Resolution (#mum)");
 
-  TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
   for(int iMult=1;iMult<=kNmultBins;iMult++){
     sprintf(histNameRes,"hZtrueMultRes_projResMult_%d",iMult);
     sprintf(histTitleRes,"Residuals, %5.1f #leq mult < %5.1f",hZtrueMultRes->GetYaxis()->GetBinLowEdge(iMult),hZtrueMultRes->GetYaxis()->GetBinUpEdge(iMult));
     TH1D *projectionOnRes_mult=hZtrueMultRes->ProjectionZ(histNameRes,1,kNzTrueBins,iMult,iMult);
     projectionOnRes_mult->SetTitle(histTitleRes);
     // GAUSSIAN FIT TO GET RESOLUTION
-    fitFun->SetParLimits(0,0.,1.e9);
-    fitFun->SetParLimits(1,-100.,100.);
-    fitFun->SetParLimits(2,0.,600.);
-    projectionOnRes_mult->Fit(fitFun,"q","",-800.,800.);
+    TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
+    fitFun->SetParLimits(0,0.,1.e4);
+    fitFun->SetParLimits(1,-20.,20.);
+    fitFun->SetParLimits(2,30.,400.);
+    fitFun->SetLineColor(kBlue+3);
+    double hist_rms=projectionOnRes_mult->GetRMS();
+    projectionOnRes_mult->Fit(fitFun,"q","",-3.0*hist_rms,3.0*hist_rms);
+    projectionOnRes_mult->GetXaxis()->SetRangeUser(-4.*fitFun->GetParameter(2),4.*fitFun->GetParameter(2));
+    projectionOnRes_mult->SetMarkerStyle(20);
+    projectionOnRes_mult->SetMarkerColor(kRed);
+    projectionOnRes_mult->SetMarkerSize(0.8);
+    projectionOnRes_mult->SetDrawOption("PE");
     projectionOnRes_mult->Write();
     hMultResol->SetBinContent(iMult,fitFun->GetParameter(2));
     hMultResol->SetBinError(iMult,fitFun->GetParError(2));
@@ -140,12 +151,22 @@ void CreateHist(std::string inFilename="recResult",std::string outFilename="Hist
     sprintf(histNameRes,"hZtrueMultRes_projResZtrue_%d",iZtrue);
     TH1D *projectionOnRes_ztrue=hZtrueMultRes->ProjectionZ(histNameRes,iZtrue,iZtrue,1,kNmultBins);
     // GAUSSIAN FIT TO GET RESOLUTION
-    fitFun->SetParLimits(0,0.,1.e9);
-    fitFun->SetParLimits(1,-100.,100.);
+    TF1 *fitFun=new TF1("fitFun","gaus",kResMin,kResMax); // declare fit function
+    fitFun->SetParLimits(0,0.,1.e4);
+    fitFun->SetParLimits(1,-50.,50.);
     fitFun->SetParLimits(2,0.,600.);
-    if(iZtrue<6||iZtrue>13)projectionOnRes_ztrue->Rebin(3);
-    projectionOnRes_ztrue->Fit(fitFun,"q","",-200.,200.);
+    fitFun->SetLineColor(kBlue+3);
+    if(iZtrue<2||iZtrue>9){ // estremal z_true classes (small sample)
+      projectionOnRes_ztrue->Rebin(2);
+      projectionOnRes_ztrue->Fit(fitFun,"q","",-800.,800.);
+    }
+    else // central z_true classes (wider sample)
+      projectionOnRes_ztrue->Fit(fitFun,"q","",-150.,150.);
     projectionOnRes_ztrue->Write();
+    projectionOnRes_ztrue->SetMarkerStyle(20);
+    projectionOnRes_ztrue->SetMarkerColor(kRed);
+    projectionOnRes_ztrue->SetMarkerSize(0.8);
+    projectionOnRes_ztrue->SetDrawOption("PE");
     hZtrueResol->SetBinContent(iZtrue,fitFun->GetParameter(2));
     hZtrueResol->SetBinError(iZtrue,fitFun->GetParError(2));
   }

@@ -4,6 +4,7 @@
 // Authors: Mario Ciacco & Emanuele Data
 
 #include <TRandom3.h>
+#include <Riostream.h>
 #include "SimulManager.h"
 #include "Particle.h"
 #include "Point2D.h"
@@ -43,6 +44,7 @@ void SimulManager::RunSimulation(TTree *tree,VTX& vert,TClonesArray& hitsFirstLa
   double TmpZ=0.;                                        // temporary z used to compute hit
   double TmpPhi=0.;                                      // temporary phi used to compute hit
   for(int iEvent=0;iEvent<fEvent;++iEvent){ // loop over events
+    if(iEvent%10000==0)std::cout<<"event: "<<iEvent<<std::endl;
     hitsFirstLayer.Clear();                              // clear first array
     hitsSecondLayer.Clear();                             // clear second array
     vert.Mult=gen->GenerateMultiplicity(fMultMethod); // generate multiplicity

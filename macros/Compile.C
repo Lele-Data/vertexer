@@ -1,10 +1,10 @@
 // Compile.C
 // The compilation macro
 
+#include <string>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <Riostream.h>
-#include <string>
 
 #include "../cfg/Constants.h"
 
@@ -41,4 +41,5 @@ void Compile(const char option='n') {
   gROOT->LoadMacro("macros/SteerSimul.C");
   gROOT->LoadMacro("macros/SteerRec.C");
   gROOT->LoadMacro("macros/CreateHist.C");
+  gROOT->LoadMacro("macros/DrawHist.C");
 }

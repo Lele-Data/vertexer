@@ -32,7 +32,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   
   // INSTANTIATE NEW TREE TO SAVE VERTICES
   TTree *vtxTree=new TTree(RecTreeName,"vertices");
-  Vertex vtx=NULL;                                    // memory location mapped to tree
+  Vertex vtx(-999.f,-999.f,-999.f,-999.f,false);      // memory location mapped to tree
   vtxTree->Branch(RecVertBaranchName,&vtx);           // connect branch to the first memory location; specify types
 
   // GET TREE FROM INPUT FILE
