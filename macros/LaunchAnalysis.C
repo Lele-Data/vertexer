@@ -1,5 +1,5 @@
 // LaunchAnalysis.C
-// Launch the analysis on a sample of 100000 events 
+// Launch the analysis on a sample of nEvents events 
 //
 // Simulation parameters:
 // kUnifMult -> uniform multiplicity
