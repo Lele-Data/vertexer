@@ -15,7 +15,7 @@ class Vertexer : public TObject{
   static Vertexer *GetInstance();                           // singleton class method
   static Vertexer *Destroy();                               // singleton class method
   bool FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const;
-  void FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const;
+  void FitVertex(double *arrayZ,int size,double& mean,double& rms,double zMin,double zMax,double binWidth) const;
   double FindZintersect(double z1,double z2,double r1,double r2) const; 
  private:
   Vertexer();                                               // (private) default constructor

@@ -34,9 +34,10 @@ Transport *Transport::Destroy(){
   return fInstance;
 }
 
-void Transport::MultipleScattering(Particle& particle,int nScatMethod){
+void Transport::MultipleScattering(Particle& particle,Cylinder *cyl,int nScatMethod){
   double u[3]; // direction 
-  double thp=(RandomScat[nScatMethod])(); // generate theta according to the multiple scattering distribution
+  double rms_scat=cyl->GetRMSscat();
+  double thp=(RandomScat[nScatMethod])(rms_scat); // generate theta according to the multiple scattering distribution
   double php=gRandom->Rndm()*2*TMath::Pi(); // generate phi according to a uniform distribution in (0,2*pi
   Rotate(particle.GetTheta(),particle.GetPhi(),thp,php,u);
   // compute the theta and phi of the particle in the lab frame
@@ -73,12 +74,12 @@ void Transport::ComputeHit(Particle particle,Layer *layer,double& zHit,double& p
   phiHit=particle.GetPhi();
 }
 
-double Transport::OffScattering(){
+double Transport::OffScattering(double rms){
   return 0.;
 }
 
-double Transport::Onscattering(){
-  return gRandom->Gaus(0.,kRMSscat);  
+double Transport::Onscattering(double rms){
+  return gRandom->Gaus(0.,rms);  
 }  
 
 // This function computes the parameter t to find the intersection of a line (particle) with a cylinder (layer/beam pipe)

@@ -41,32 +41,39 @@ bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
   return false;
 }
 
-void Vertexer::FitVertex(double *arrayZ,double& mean,double& rms,double zMin,double zMax) const{
+void Vertexer::FitVertex(double *arrayZ,int size,double& mean,double& rms,double zMin,double zMax,double binWidth) const{
+  if(zMin>zMax)return;
   int iArr=0;
   int iMin=0;
   double nZint=1.;
   // compute mean
-  while(arrayZ[iArr]<zMin)++iArr; // find the smallest z used to compute the mean
+  if(arrayZ[iArr]<zMin){
+    while(arrayZ[iArr]<zMin)++iArr; // find the smallest z used to compute the mean
+  }
   iMin=iArr++;
   mean=arrayZ[iMin];
   // std::cout<<mean<<std::endl;
-  while(arrayZ[iArr]<zMax){
-    ++nZint;
-    // std::cout<<arrayZ[iArr]<<std::endl;
-    mean+=arrayZ[iArr];
-    ++iArr;
+  if(mean<zMax){
+    while(arrayZ[iArr]<zMax && iArr<size){
+      ++nZint;
+      // std::cout<<arrayZ[iArr]<<std::endl;
+      mean+=arrayZ[iArr];
+      ++iArr;
+    }
   }
   mean/=nZint;
   // compute rms
   iArr=iMin+1;
   nZint=1.;
   rms=(arrayZ[iMin]-mean)*(arrayZ[iMin]-mean);
-  while(!(arrayZ[iArr]>zMax)){
+  while(arrayZ[iArr]<zMax && iArr<size){
     ++nZint;
     rms+=(arrayZ[iArr]-mean)*(arrayZ[iArr]-mean);
+    // std::cout<<arrayZ[iArr]<<std::endl;
     ++iArr;
   }
-  if(nZint>1.5)rms/=(nZint-1.);
+  if(nZint<1.5){rms=binWidth; return;}
+  rms/=(nZint-1.);
   rms=TMath::Sqrt(rms);
 }
 
@@ -87,8 +94,10 @@ int Vertexer::FindFirstMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
   for(int iBins=2;iBins<=nBins;++iBins){
-    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax))
+    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)){
+      // std::cout<<iBins<<"="<<hist->GetBinContent(iBins)<<" ,"<<nBinMax<<"="<<hist->GetBinContent(nBinMax)<<std::endl;
       nBinMax=iBins;
+    }
   }
   return nBinMax;
 }
@@ -97,8 +106,10 @@ int Vertexer::FindSecondMaximum(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=nBins;
   for(int iBins=nBins-1;iBins>0;--iBins){
-    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)) 
+    if(hist->GetBinContent(iBins)>hist->GetBinContent(nBinMax)){
+      // std::cout<<iBins<<"="<<hist->GetBinContent(iBins)<<" ,"<<nBinMax<<"="<<hist->GetBinContent(nBinMax)<<std::endl;
       nBinMax=iBins;
+    }
   }
   return nBinMax;
 }

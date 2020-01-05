@@ -58,8 +58,8 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // INSTANTIATE LAYERS
   Layer *layers[2];
-  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength,kZresol,kRphiResol); // cm
-  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength,kZresol,kRphiResol); // cm
+  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength,kRadLengthSi,kZresol,kRphiResol); // cm, cm
+  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength,kRadLengthSi,kZresol,kRphiResol); // cm, cm
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
   RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth,meanNoiseSoft);
