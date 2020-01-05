@@ -37,6 +37,12 @@ const double kSecondLayerLength=27.0; // cm
 const double kZresol=0.0120;   // cm
 const double kRphiResol=0.0030;// cm
 
+// MATERIALS
+const double kDensityBe=1.85; // g cm^-3
+const double kDensitySi=2.33; // g cm^-3
+const double kRadLengthBe=35.28; // cm (PDG)
+const double kRadLengthSi=9.370; // cm (PDG)
+
 // GENERATOR PARAMETERS
 const double kMaxMultiplicity=60.;
 const double kConstMultiplicity=3.;
@@ -67,6 +73,6 @@ const int nMaxInter=500;       // size of array for tracklets intersection with 
 const double kDeltaPhi=0.005;  // phi slice width
 const double kZbinWidth=0.04;  // bin width
 const double kDeltaZ=0.10;     // horizontal cut
-const double kZwidth=0.24;     // centroid width
+const double kZwidth=0.240;     // centroid width
 
 #endif // CONSTANTS_H

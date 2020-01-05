@@ -8,7 +8,7 @@
 
 ClassImp(BeamPipe);
 
-BeamPipe::BeamPipe(double radius,double thickness):Cylinder(radius,thickness){
+BeamPipe::BeamPipe(double radius,double thickness,double radLength):Cylinder(radius,thickness,radLength){
   // constructor
 }
 

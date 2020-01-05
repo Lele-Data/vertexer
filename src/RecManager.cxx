@@ -108,7 +108,7 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     if(vertxr->FindVertex(hZrec,zTmp,fDeltaZ)){         // check if vertex is found from histogram
       BubbleSort(zIntersectionTrack,nMaxInter);                                         // sort array of intersections with the z axis
       double zMin=zTmp-fZWidth/2., zMax=zTmp+fZWidth/2.;
-      vertxr->FitVertex(zIntersectionTrack,zMean,zRms,zMin,zMax);     // fit vertex (within centroid region) if found
+      vertxr->FitVertex(zIntersectionTrack,nMaxInter,zMean,zRms,zMin,zMax,fZBinWidth);  // fit vertex (within centroid region) if found
       #ifdef DEBUG_PRINT
         std::cout<<zMin<<"\t"<<zMax<<"\t"<<zTmp<<"\t"<<zMean<<"\t"<<zRms<<"\t"<<vert.Z<<std::endl;
       #endif // DEBUG_PRINT

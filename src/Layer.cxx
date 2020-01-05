@@ -8,7 +8,7 @@
 
 ClassImp(Layer);
 
-Layer::Layer(double radius,double thickness,double length,double zresol,double rphiresol):Cylinder(radius,thickness),
+Layer::Layer(double radius,double thickness,double length,double radLength,double zresol,double rphiresol):Cylinder(radius,thickness,radLength),
 fLength(length),
 fZresol(zresol),
 fRphiResol(rphiresol){

@@ -34,10 +34,10 @@ void SteerSimul(std::string filename="simul",const int nEvent=100000,double nMul
   tree->Branch(SimHitSecondBranchName,&ArraySecondLayer); // connect branch to the TClonesArray of Point2D (second layer)
 
   // INSTANTIATE THE BEAM PIPE AND DETECTOR
-  BeamPipe *bpipe=new BeamPipe(kBpipeRadius,kBpipeThick); // cm
+  BeamPipe *bpipe=new BeamPipe(kBpipeRadius,kBpipeThick,kRadLengthBe); // cm, cm
   Layer *layers[2];
-  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength); // cm
-  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength); // cm
+  layers[0]=new Layer(kFirstLayerRadius,kFirstLayerThick,kFirstLayerLength,kRadLengthSi); // cm, cm
+  layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength,kRadLengthSi); // cm, cm
 
   // GET THE SIMULATION MANAGER INSTANCE AND RUN THE SIMULATION
   SimulManager *manager=SimulManager::GetInstance(nEvent,nMult,nEta,nScat,seed);

@@ -56,19 +56,19 @@ void SimulManager::RunSimulation(TTree *tree,VTX& vert,TClonesArray& hitsFirstLa
       gen->GenerateParticle(particle,fEtaMethod);        // generate particle direction
       // INTERACTION WITH BEAM PIPE
       transp->Intersection(particle,bpipe);              // intersect with beam pipe
-      transp->MultipleScattering(particle,fMultScatMethod);// compute new direction (mult scat)
+      transp->MultipleScattering(particle,(Cylinder*)bpipe,fMultScatMethod);// compute new direction (mult scat)
       // INTERACTION WITH LAYER 1
       transp->Intersection(particle,layers[0]);          // intersect with layer 1
       if(particle.GetZ()>(-layers[0]->GetLength()/2.)&&particle.GetZ()<(layers[0]->GetLength()/2.)){ // intersection check on first layer
         transp->ComputeHit(particle,layers[0],TmpZ,TmpPhi);          //compute hit on layer
         new(hitsFirstLayer[iFirstLayer++])Point2D(TmpZ,TmpPhi);      // add hit to TClonesArray
-        transp->MultipleScattering(particle,fMultScatMethod);        // compute new direction
+        transp->MultipleScattering(particle,(Cylinder*)layers[0],fMultScatMethod);        // compute new direction
         // INTERACTION WITH LAYER 2
         transp->Intersection(particle,layers[1]);        // intersect with layer 2
         if(particle.GetZ()>(-layers[1]->GetLength()/2.)&&particle.GetZ()<(layers[1]->GetLength()/2.)){ // intersection check on second layer
           transp->ComputeHit(particle,layers[1],TmpZ,TmpPhi);        //compute hit on layer
           new(hitsSecondLayer[iSecondLayer++])Point2D(TmpZ,TmpPhi);  // add hit to TClonesArray
-          transp->MultipleScattering(particle,fMultScatMethod);      // compute new direction
+          transp->MultipleScattering(particle,(Cylinder*)layers[1],fMultScatMethod);      // compute new direction
         } // end of intersection check on second layer
       } // end of intersection check on first layer
     } // end of loop over particles
