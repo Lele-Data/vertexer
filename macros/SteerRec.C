@@ -14,7 +14,7 @@
 #include "../src/RecManager.h"
 #include "../cfg/Constants.h"
 
-void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double zWidth=kZwidth){
+void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double zWidth=kZwidth,int meanNoiseSoft=kMeanNnoise){
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
   std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
   
@@ -57,7 +57,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   layers[1]=new Layer(kSecondLayerRadius,kSecondLayerThick,kSecondLayerLength,kZresol,kRphiResol); // cm
 
   // INSTANTIATE RECONSTRUCTION MANAGER AND RUN SIMULATION
-  RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth);
+  RecManager *manager=RecManager::GetInstance(deltaPhi,zBinWidth,deltaZ,zWidth,meanNoiseSoft);
   swatch.Start(); // start stopwatch
   manager->RunReconstruction(inTree,vtxTree,vert,vtx,hitsFirstLayer,hitsSecondLayer,layers);
   swatch.Stop();

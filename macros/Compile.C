@@ -42,4 +42,5 @@ void Compile(const char option='n') {
   gROOT->LoadMacro("macros/SteerRec.C");
   gROOT->LoadMacro("macros/CreateHist.C");
   gROOT->LoadMacro("macros/DrawHist.C");
+  gROOT->LoadMacro("macros/LaunchAnalysis.C"); // launch complete analysis
 }

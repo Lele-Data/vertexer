@@ -19,11 +19,12 @@ RecManager *RecManager::fInstance=NULL; // static data member
 
 void BubbleSort(double arr[],int size); // helper function
 
-RecManager::RecManager(double deltaPhi,double zBinWidth,double deltaZ,double zWidth):TObject(),
+RecManager::RecManager(double deltaPhi,double zBinWidth,double deltaZ,double zWidth,int meanNoiseSoft):TObject(),
 fDeltaPhi(deltaPhi),           // phi slice width
 fZBinWidth(zBinWidth),         // bin width  
 fDeltaZ(deltaZ),               // horizontal cut
-fZWidth(zWidth){               // centroid width
+fZWidth(zWidth),               // centroid width
+fMeanNoiseSoft(meanNoiseSoft){ // mean noise hits
   vertxr=Vertexer::GetInstance();
 }
 
@@ -31,8 +32,8 @@ RecManager::~RecManager(){
   vertxr=Vertexer::Destroy();
 }
 
-RecManager *RecManager::GetInstance(double deltaPhi,double zBinWidth,double deltaZ,double zWidth){
-  if(!RecManager::fInstance) fInstance=new RecManager(deltaPhi,zBinWidth,deltaZ,zWidth);
+RecManager *RecManager::GetInstance(double deltaPhi,double zBinWidth,double deltaZ,double zWidth,int meanNoiseSoft){
+  if(!RecManager::fInstance) fInstance=new RecManager(deltaPhi,zBinWidth,deltaZ,zWidth,meanNoiseSoft);
   return fInstance;
 }
 
@@ -53,8 +54,8 @@ void RecManager::RunReconstruction(TTree *inTree,TTree *vtxTree,VTX& vert,Vertex
     // DEFINE AND INSTANTIATE ARRAYS OF HIT POINTS
     int nHitLayer1=hitsFirstLayer->GetEntries();
     int nHitLayer2=hitsSecondLayer->GetEntries();
-    int nHitNoiseLayer1=GenerateNhitNoise(kMeanNnoise1);              // generate the number of false hits
-    int nHitNoiseLayer2=GenerateNhitNoise(kMeanNnoise2);
+    int nHitNoiseLayer1=GenerateNhitNoise();                          // generate the number of false hits
+    int nHitNoiseLayer2=GenerateNhitNoise();
     int nHitTotLayer1=nHitLayer1+nHitNoiseLayer1;                     // total number of hits
     int nHitTotLayer2=nHitLayer2+nHitNoiseLayer2;
     Point2D **arrayHitFirstLayer=new Point2D*[nHitTotLayer1];         // allocate memory for hit array
@@ -142,8 +143,8 @@ void RecManager::Smearing(Point2D *hit,Layer *layer) const{
   hit->SetPhi(new_phi);
 }
 
-int RecManager::GenerateNhitNoise(int meanNoiseNumber) const{
-  return gRandom->Poisson(meanNoiseNumber);
+int RecManager::GenerateNhitNoise() const{
+  return gRandom->Poisson(fMeanNoiseSoft);
 }
 
 void RecManager::GenerateHitNoiseSoft(Point2D **arrayHit,Layer *layer,int hitCounter,int nHitTot) const{

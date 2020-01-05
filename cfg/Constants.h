@@ -3,8 +3,8 @@
 //
 // Authors: Mario Ciacco & Emanuele Data
 
-#ifndef CONSTANTS
-#define CONSTANTS
+#ifndef CONSTANTS_H
+#define CONSTANTS_H
 
 // DIRECTORIES
 const char *BUILD_DIR="build"; // build directory name
@@ -19,6 +19,11 @@ const char *SimVertBranchName="vert";
 const char *SimHitFirstBranchName="hitsFirstLayer";
 const char *SimHitSecondBranchName="hitsSecondLayer";
 const char *RecVertBaranchName="vtx";
+
+// FILENAME 
+const char *kFileNameSimul="Simul";
+const char *kFileNameRec="Rec";
+const char *kFileNameHist="Hist";
 
 // DETECTOR AND BEAM PIPE
 const double kBpipeRadius=3.0; // cm
@@ -53,11 +58,10 @@ const double kMultBinsExtend[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5
 const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0};
 
 // RECONSTRUCTION PARAMETERS
-const int kMeanNnoise1=20.;    // mean number of generated false hits (first layer)
-const int kMeanNnoise2=20.;    // mean number of generated false hits (second layer)
+const int kMeanNnoise=20.;     // mean number of generated false hits
 const double kZmax=30.0;       // lower limit for the histogram  
 const double kZmin=-30.0;      // upper limit for the histogram
-const int nMaxInter=100;       // size of array for tracklets intersection with z
+const int nMaxInter=100;       // size of array for tracklets intersection with z (WARNING: if kMeanNoise is hish, nMaxInter must be increased!)
 
 // VERTEXER ALGORITHM PARAMETERS
 const double kDeltaPhi=0.005;  // phi slice width
@@ -65,4 +69,4 @@ const double kZbinWidth=0.04;  // bin width
 const double kDeltaZ=0.10;     // horizontal cut
 const double kZwidth=0.24;     // centroid width
 
-#endif // CONSTANTS
+#endif // CONSTANTS_H
