@@ -9,10 +9,12 @@
 #include <TBranch.h>
 #include <TClonesArray.h>
 #include <TStopwatch.h>
+#include <Riostream.h>
 #include "../src/SimulManager.h"
 #include "../cfg/Constants.h"
 
-void SteerSimul(std::string filename="simul",const int nEvent=100000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,double seed=42345){
+void SteerSimul(std::string filename="simul",const int nEvent=100000,double nMult=MultMethod::kUnifMult,double nEta=EtaMethod::kUnifEta,double nScat=MultScatMethod::kOnScat,uint seed=42345){
+  if(nEvent>1.e9){std::cout<<"Too many events!"<<std::endl; return;}
   const int nHits=kMaxMultiplicity;                       // the maximum number of expoected hits (in Generator.h)
   std::string filename_ext=FILE_DIR+filename+".root";     // filename with *.root extension
   TStopwatch swatch;
