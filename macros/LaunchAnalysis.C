@@ -28,7 +28,7 @@ enum LaunchSettings{
   kHistOff
 };
 
-void LaunchAnalysis(int nEvents,LaunchSettings setting){
+void LaunchAnalysis(int nEvents,LaunchSettings setting,uint seed=42345){
   char launchSimul[80];
   char launchRec[80];
   char launchHist[80];
@@ -94,7 +94,7 @@ void LaunchAnalysis(int nEvents,LaunchSettings setting){
       std::cout<<"Uniform distributions, multiple scattering on"<<std::endl;
     }
   }
-  sprintf(launchSimul,"SteerSimul(\"%s%s\",%d,%s,%s,%s)",kFileNameSimul,SettingDistr,nEvents,DistrMult,DistrEta,OnOffScat);
+  sprintf(launchSimul,"SteerSimul(\"%s%s\",%d,%s,%s,%s,%d)",kFileNameSimul,SettingDistr,nEvents,DistrMult,DistrEta,OnOffScat,seed);
   sprintf(launchRec,"SteerRec(\"%s%s\",\"%s%s\",0.005,0.04,0.10,0.240,%s)",kFileNameSimul,SettingDistr,kFileNameRec,SettingDistr,MeanNoise);
   sprintf(launchHist,"CreateHist(\"%s%s\",\"%s%s\",%s)",kFileNameRec,SettingDistr,kFileNameHist,SettingDistr,DeltaMultBins);
   sprintf(launchDraw,"DrawHist(\"%s%s\")",kFileNameHist,SettingDistr);
