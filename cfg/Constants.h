@@ -61,7 +61,7 @@ const double kMultBins[]={2.5,3.5,4.5,5.5,7.5,9.5,14.5,24.5,34.5,44.5,54.5,70.0}
 const int kMeanNnoise=20.;     // mean number of generated false hits
 const double kZmax=30.0;       // lower limit for the histogram  
 const double kZmin=-30.0;      // upper limit for the histogram
-const int nMaxInter=100;       // size of array for tracklets intersection with z (WARNING: if kMeanNoise is hish, nMaxInter must be increased!)
+const int nMaxInter=500;       // size of array for tracklets intersection with z (WARNING: if kMeanNoise is hish, nMaxInter must be increased!)
 
 // VERTEXER ALGORITHM PARAMETERS
 const double kDeltaPhi=0.005;  // phi slice width

@@ -15,9 +15,14 @@
 #include "../cfg/Constants.h"
 
 void SteerRec(std::string inFilename="simul",std::string outFilename="recResult",double deltaPhi=kDeltaPhi,double zBinWidth=kZbinWidth,double deltaZ=kDeltaZ,double zWidth=kZwidth,int meanNoiseSoft=kMeanNnoise){
+  if(deltaPhi>0.05 || meanNoiseSoft>100){ // check if deltaPhi or meanNoiseSoft is not too high to not have segmentation violation due to dimension of tracklets intersection array
+    std::cout<<"--- WARNING ---"<<std::endl;
+    std::cout<<"Parameter DeltaPhi or MeanNnoise is too high"<<std::endl;
+    return;
+  }
   std::string inFilename_ext=FILE_DIR+inFilename+".root";      // filename with *.root extension
   std::string outFilename_ext=FILE_DIR+outFilename+".root";    // filename with *.root extension
-  
+    
   TStopwatch swatch;
 
   // DECLARE MEMORY LOCATION
@@ -32,7 +37,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
     std::cout<<"No input file!"<<std::endl;
     return;
   }
-  
+    
   // INSTANTIATE NEW TREE TO SAVE VERTICES
   TTree *vtxTree=new TTree(RecTreeName,"vertices");
   static Vertex vtx(-999.f,-999.f,-999.f,-999.f,false);// memory location mapped to tree
@@ -40,7 +45,7 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
 
   // GET TREE FROM INPUT FILE
   TTree *inTree=(TTree*)inFile.Get(SimulTreeName);
-  
+    
   // GET TREE BRANCHES FROM EXISTING TREE
   TBranch *bVertMult=inTree->GetBranch(SimVertBranchName);
   TBranch *bFirstLayer=inTree->GetBranch(SimHitFirstBranchName);
@@ -63,9 +68,10 @@ void SteerRec(std::string inFilename="simul",std::string outFilename="recResult"
   swatch.Stop();
   swatch.Print("m");
   manager=RecManager::Destroy();
-  
+    
   // WRITE AND CLOSE FILE
   outFile.Write();
   outFile.Close();
   inFile.Close();
+    
 }
