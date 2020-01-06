@@ -21,8 +21,8 @@ class Vertexer : public TObject{
   Vertexer();                                               // (private) default constructor
   Vertexer(const Vertexer& gen);                            // (private) copy constructor
   ~Vertexer();                                              // (private) destructor
-  static int FindPeakFromLeft(TH1D* hist);                  // find the bin of the first highest maximum
-  static int FindPeakFromRight(TH1D* hist);                 // find the bin of the second highest maximum
+  static int FindPeakFromLeft(TH1D* hist);                  // find the bin of the highest peak from left
+  static int FindPeakFromRight(TH1D* hist);                 // find the bin of the highest peak from right
   static Vertexer *fInstance;                               // The class instance
 
  ClassDef(Vertexer,1);
