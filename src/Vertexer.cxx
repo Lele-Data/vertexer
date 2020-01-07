@@ -32,8 +32,8 @@ Vertexer *Vertexer::Destroy(){
 
 bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
   if(hZrec->GetEntries()<1.e-7)return false;
-  int bFirstMax=FindFirstMaximum(hZrec);
-  int bSecondMax=FindSecondMaximum(hZrec);
+  int bFirstMax=FindPeakFromLeft(hZrec);
+  int bSecondMax=FindPeakFromRight(hZrec);
   zTmp=(hZrec->GetBinCenter(bFirstMax)+hZrec->GetBinCenter(bFirstMax))/2.;
   double deltaZobs=fabs((double)(bFirstMax-bSecondMax))*hZrec->GetBinWidth(1); // compute the distance between the two highest bins
   if(deltaZobs<deltaZ) // horizontal (z) cut
@@ -41,7 +41,7 @@ bool Vertexer::FindVertex(TH1D* hZrec,double& zTmp,const double deltaZ) const{
   return false;
 }
 
-void Vertexer::FitVertex(double *arrayZ,int size,double& mean,double& rms,double zMin,double zMax,double binWidth) const{
+void Vertexer::MeanVertex(double *arrayZ,int size,double& mean,double& rms,double zMin,double zMax,double binWidth) const{
   if(zMin>zMax)return;
   int iArr=0;
   int iMin=0;
@@ -90,7 +90,7 @@ double Vertexer::FindZintersect(double z1,double z2,double r1,double r2) const{
   return -(z2-z1)/(r2-r1)*r2+z2; // the intersection of a 2D (in the z-r plane) straight line with the z axis
 }
 
-int Vertexer::FindFirstMaximum(TH1D* hist){
+int Vertexer::FindPeakFromLeft(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=1;
   for(int iBins=2;iBins<=nBins;++iBins){
@@ -102,7 +102,7 @@ int Vertexer::FindFirstMaximum(TH1D* hist){
   return nBinMax;
 }
 
-int Vertexer::FindSecondMaximum(TH1D* hist){
+int Vertexer::FindPeakFromRight(TH1D* hist){
   int nBins=hist->GetNbinsX();
   int nBinMax=nBins;
   for(int iBins=nBins-1;iBins>0;--iBins){
